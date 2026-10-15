@@ -54,7 +54,7 @@ body { min-height: 100vh; background: #0d0d16 center/cover no-repeat fixed; over
 .world { display: flex; gap: 28px; }
 .zone { display: grid; gap: 2px; }
 .zone span { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .08em; }
-.zone b { font-weight: 500; font-size: 18px; font-variant-numeric: tabular-nums; }
+.zone b { white-space: nowrap; font-weight: 500; font-size: 18px; font-variant-numeric: tabular-nums; }
 .zone small { font-size: 11px; color: var(--mute); }
 
 .card { padding: 18px 20px; }
