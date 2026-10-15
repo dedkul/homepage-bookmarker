@@ -1,6 +1,6 @@
-# Homepage Bookmarker (working title)
+# Lumen
 
-A fast, minimal new-tab page for Chromium browsers (Chrome, Brave, Edge, Arc, Vivaldi).
+Lumen is a fast, minimal new-tab page for Chromium browsers (Chrome, Brave, Edge, Arc, Vivaldi).
 
 **Status:** design phase. We are iterating on HTML prototypes in `prototypes/`. Production code starts only after the layout is final.
 

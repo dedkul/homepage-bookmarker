@@ -52,3 +52,11 @@ All four show the same content so we compare layout only.
 - **Video background dropped (pending confirmation).** *Why:* speed is the core promise.
 - **Background overlay:** colour picker + opacity (0–90%) + blur (0–30px). *Why:* fixes photos that are too bright or busy for legible text. *Perf note:* production bakes the blur into the stored image when it's saved, so it costs nothing at runtime. The prototype uses live CSS.
 - **Onboarding planned:** a one-time welcome tab on install. Steps: pick favorites → pick style → background. Each step is skippable.
+
+---
+
+## 2026-10-15 · v0.4 · Name: Lumen
+
+- **Chosen name: Lumen.** *Why:* it's short, easy to say and spell, so people can recommend it out loud. It suggests light and clarity, which fits a calm, fast homepage. It was picked from a shortlist (Cove, Porch, Europa, Hush, Nook).
+- *Risk:* "Lumen" is common in tech. Before publishing, check the Chrome Web Store, domains and trademarks; a fallback is a qualifier like "Lumen Tab".
+- **Confirmed:** video is out of v1 (the settings page shows a "coming soon" hint). The default zones are Sydney + India.
