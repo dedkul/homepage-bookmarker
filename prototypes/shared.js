@@ -11,7 +11,9 @@ const FAVS = [
   ["Behance", "behance.net", "#1769ff"], ["Amazon", "amazon.com", "#ff9900"], ["Maps", "maps.google.com", "#34a853"],
   ["Netflix", "netflix.com", "#e50914"],
 ];
-const ZONES = [["Home", "Asia/Kolkata"], ["New York", "America/New_York"], ["London", "Europe/London"]];
+// One optional second clock (the main clock is always local time). null = none.
+let Z = JSON.parse(localStorage.zone || "null") ?? { n: "New York", tz: "America/New_York" };
+const ALL_TZ = Intl.supportedValuesOf("timeZone");
 
 const S = Object.assign({ rows: 2, per: 6, bg: "aurora", theme: "dark", h24: false, newtab: false },
   JSON.parse(localStorage.proto || "{}"));
@@ -28,8 +30,35 @@ function tick() {
   $$("[data-ampm]").forEach(e => e.textContent = S.h24 ? "" : h < 12 ? "AM" : "PM");
   $$("[data-date]").forEach(e => e.textContent = fmt(undefined, { weekday: "long", month: "long", day: "numeric" }));
   $$("[data-greet]").forEach(e => e.textContent = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening");
-  $$("[data-world]").forEach(e => e.innerHTML = ZONES.map(([n, tz]) =>
-    `<div class="zone"><span>${n}</span><b>${fmt(tz, o)}</b><small>${offset(tz)}</small></div>`).join(""));
+  $$("[data-tz]").forEach(e => e.textContent = fmt(e.dataset.tz, o));
+}
+
+// Rendered only when the zone changes, so tick() doesn't wipe the edit form.
+const storeZone = () => { localStorage.zone = JSON.stringify(Z); renderWorld(); };
+function renderWorld() {
+  $$("[data-world]").forEach(el => {
+    el.innerHTML = Z
+      ? `<div class="zone"><span>${esc(Z.n)}</span><b data-tz="${Z.tz}"></b><small>${offset(Z.tz)}</small>
+         <button class="zbtn" type="button" data-act="edit">Edit</button></div>`
+      : `<button class="zbtn add-zone" type="button" data-act="edit">+ Add a second time zone</button>`;
+    el.onclick = e => { if (e.target.dataset.act === "edit") editZone(el); };
+  });
+  tick();
+}
+function editZone(el) {
+  el.innerHTML = `<form class="zform"><input name="n" placeholder="Label, e.g. Home" aria-label="Label" required value="${Z ? esc(Z.n) : ""}">
+    <input name="tz" list="tzs" placeholder="Time zone, e.g. Asia/Kolkata" aria-label="Time zone" required value="${Z ? Z.tz : ""}">
+    <datalist id="tzs">${ALL_TZ.map(t => `<option value="${t}">`).join("")}</datalist>
+    <div><button>Save</button>${Z ? '<button type="button" data-act="del">Remove</button>' : ""}<button type="button" data-act="cancel">Cancel</button></div></form>`;
+  const f = $("form", el);
+  f.n.focus();
+  f.tz.oninput = () => f.tz.setCustomValidity("");
+  el.onclick = e => { const a = e.target.dataset.act; if (a === "del") Z = null; if (a) storeZone(); };
+  f.onsubmit = e => {
+    e.preventDefault();
+    if (!ALL_TZ.includes(f.tz.value)) { f.tz.setCustomValidity("Pick a time zone from the list"); f.tz.reportValidity(); return; }
+    Z = { n: f.n.value.trim(), tz: f.tz.value }; storeZone();
+  };
 }
 
 function renderFavs() {
@@ -92,5 +121,5 @@ function apply() {
 }
 
 document.body.append(panel);
-apply(); renderTodos(); renderNotes();
+apply(); renderWorld(); renderTodos(); renderNotes();
 setInterval(tick, 1000);

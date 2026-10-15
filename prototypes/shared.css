@@ -86,3 +86,17 @@ body { min-height: 100vh; background: #0d0d16 center/cover no-repeat fixed; over
 .tweaks a { color: #9a9aa2; }
 
 @media (max-width: 760px) { .favs { grid-template-columns: repeat(4, var(--tile)); } }
+
+/* Second time zone: add / edit / remove */
+:root { --inv: #111; } [data-theme=light] { --inv: #fff; }
+.zbtn { font: inherit; font-size: 12px; color: var(--mute); background: none; border: 0; padding: 4px 0; cursor: pointer; }
+.zbtn:hover { color: var(--fg); }
+.zone .zbtn { grid-column: 1 / -1; justify-self: start; opacity: 0; transition: opacity .15s; }
+.zone:hover .zbtn, .zbtn:focus-visible { opacity: 1; }
+.add-zone { padding: 6px 14px; border: 1px dashed var(--line); border-radius: 999px; }
+.zform { display: grid; gap: 8px; width: 270px; text-align: left; }
+.zform input { font: inherit; font-size: 14px; color: var(--fg); background: var(--glass); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; outline: 0; }
+.zform input:focus { border-color: color-mix(in srgb, var(--fg) 40%, transparent); }
+.zform div { display: flex; gap: 6px; }
+.zform button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--glass); color: var(--fg); cursor: pointer; }
+.zform button:first-child { background: var(--fg); color: var(--inv); }

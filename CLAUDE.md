@@ -1,5 +1,3 @@
-@AGENTS.md
-
 # Engineering Protocol
 
 These rules apply to every task unless explicitly overridden.

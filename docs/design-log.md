@@ -34,3 +34,11 @@ All four show the same content so we compare layout only.
 - Should favorites scale tile size with the per-row count, or keep a fixed size?
 - Do tasks and notes belong on the new tab at all, or are they v2?
 - Background: does a photo or video change which layout works?
+
+---
+
+## 2026-10-15 · v0.2 · Narrowed to A (Focus) vs C (Editorial)
+
+- **Dropped B (Dock) and D (Bento).** D read as a dashboard, not a calm homepage. B pushed favorites far from the centre. (Files kept for the case study.)
+- **World clocks → one optional second time zone.** The user moves between two time zones, so three fixed cities was noise. The main clock is always local time. The second clock can be added, edited (label + IANA zone with autocomplete) or removed inline; Edit appears on hover.
+  *Why inline, not in settings:* editing happens right where the clock is, so you don't have to hunt for it.
