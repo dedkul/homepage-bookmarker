@@ -1,0 +1,25 @@
+<!doctype html><html lang="en" data-theme="dark" data-bg="aurora"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="shared.css"><title>C · Editorial</title><style>
+body{display:grid;grid-template-columns:minmax(320px,5fr) 7fr;min-height:100vh}
+.left{display:flex;flex-direction:column;justify-content:space-between;padding:56px;border-right:1px solid var(--line)}
+.clock{font-family:ui-serif,"New York",Georgia,serif;font-weight:300;font-size:clamp(110px,13vw,210px);letter-spacing:-.05em}
+.ampm{font-size:18px;color:var(--mute);margin:8px 0 0 6px;letter-spacing:.1em}
+.date{font-family:ui-serif,Georgia,serif;font-size:24px;font-style:italic;margin-top:20px;color:var(--fg)}
+.world{flex-direction:column;gap:0}
+.zone{grid-template-columns:1fr auto;grid-template-areas:"n t" "o t";padding:14px 0;border-top:1px solid var(--line)}
+.zone span{grid-area:n}.zone small{grid-area:o}.zone b{grid-area:t;align-self:center;font-size:22px;font-weight:400}
+.right{display:flex;flex-direction:column;justify-content:center;gap:44px;padding:56px}
+.right .search{width:100%;max-width:none}
+.favs{justify-content:start}
+.notes-card{max-width:520px}
+@media(max-width:900px){body{grid-template-columns:1fr}.left{border:0}}
+</style></head><body>
+<section class="left">
+  <div><div style="display:flex;align-items:flex-start"><div class="clock" data-clock></div><div class="ampm" data-ampm></div></div><div class="date" data-date></div></div>
+  <div class="world" data-world></div>
+</section>
+<section class="right">
+  <form class="search glass" action="https://www.google.com/search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input name="q" placeholder="Search the web" aria-label="Search the web" autofocus></form>
+  <nav class="favs" data-favs aria-label="Favorites"></nav>
+  <section class="card glass notes-card"><h3>Notes</h3><div class="notes" data-notes></div></section>
+</section>
+<script src="shared.js"></script></body></html>

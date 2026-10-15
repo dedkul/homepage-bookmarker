@@ -1,0 +1,23 @@
+<!doctype html><html lang="en" data-theme="dark" data-bg="aurora"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="shared.css"><title>D · Bento</title><style>
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1160px;margin:0 auto;padding:56px 24px;min-height:100vh;align-content:center}
+.bento .search{grid-column:1/-1;width:auto}
+.t-clock{grid-column:span 2;display:flex;flex-direction:column;justify-content:space-between;min-height:200px;padding:24px}
+.t-clock .clock{font-size:96px}
+.t-world .world{flex-direction:column;gap:14px}
+.t-world .zone{grid-template-columns:1fr auto;grid-template-areas:"n t" "o t"}
+.t-world .zone span{grid-area:n}.t-world .zone small{grid-area:o}.t-world .zone b{grid-area:t;align-self:center}
+.t-todo{grid-row:span 2}
+.t-favs{grid-column:span 3;padding:22px}
+.t-favs .favs{--tile:76px;justify-content:space-between}
+.t-notes{grid-column:1/-1}.t-notes textarea{min-height:60px}
+@media(max-width:900px){.bento{grid-template-columns:1fr 1fr}.t-favs,.t-clock{grid-column:1/-1}.t-todo{grid-row:auto}}
+</style></head><body>
+<main class="bento">
+  <form class="search glass" action="https://www.google.com/search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input name="q" placeholder="Search the web" aria-label="Search the web" autofocus></form>
+  <section class="t-clock glass"><div class="greet" data-greet></div><div><div class="clock" data-clock></div><div class="date" data-date></div></div></section>
+  <section class="t-world card glass"><h3>World</h3><div class="world" data-world></div></section>
+  <section class="t-todo card glass"><h3>Tasks</h3><div class="todo" data-todo></div></section>
+  <section class="t-favs glass"><nav class="favs" data-favs aria-label="Favorites"></nav></section>
+  <section class="t-notes card glass"><h3>Notes</h3><div class="notes" data-notes></div></section>
+</main>
+<script src="shared.js"></script></body></html>
