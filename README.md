@@ -27,4 +27,4 @@ Open `prototypes/index.html` in a browser. No build step.
 WXT (Manifest V3 extension framework) + TypeScript, with a minimal UI layer for the new-tab page.
 
 ## Docs
-- [Design log](docs/design-log.md): every iteration and the reasoning behind each decision. Mirrors the Figma case-study file.
+- [Design log](docs/design-log.md): every iteration and the reasoning behind each decision. Mirrors the [Figma case-study file](https://www.figma.com/design/XVdKJ8do088Mqgk2yfAEHV).
