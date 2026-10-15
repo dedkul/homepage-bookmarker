@@ -100,3 +100,13 @@ body { min-height: 100vh; background: #0d0d16 center/cover no-repeat fixed; over
 .zform div { display: flex; gap: 6px; }
 .zform button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--glass); color: var(--fg); cursor: pointer; }
 .zform button:first-child { background: var(--fg); color: var(--inv); }
+
+/* Background overlay (colour + opacity + blur) */
+.scrim { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: color-mix(in srgb, var(--ov, #000) var(--ovo, 0%), transparent);
+  backdrop-filter: blur(var(--blur, 0px)); -webkit-backdrop-filter: blur(var(--blur, 0px)); }
+.tweaks .adj { display: grid; gap: 8px; }
+.tweaks .adj label { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tweaks .adj input { position: static; opacity: 1; }
+.tweaks .adj input[type=range] { width: 160px; accent-color: #f5f5f7; }
+.tweaks .adj input[type=color] { width: 36px; height: 24px; padding: 0; border: 0; background: none; }

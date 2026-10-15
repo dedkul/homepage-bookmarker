@@ -15,7 +15,7 @@ const FAVS = [
 let Z = JSON.parse(localStorage.zone || "null") ?? { n: "New York", tz: "America/New_York" };
 const ALL_TZ = Intl.supportedValuesOf("timeZone");
 
-const S = Object.assign({ rows: 2, per: 6, bg: "aurora", theme: "dark", h24: false, newtab: false },
+const S = Object.assign({ rows: 2, per: 6, bg: "aurora", theme: "dark", h24: false, newtab: false, ov: "#000000", ovo: 0, blur: 0 },
   JSON.parse(localStorage.proto || "{}"));
 const save = () => { localStorage.proto = JSON.stringify(S); apply(); };
 
@@ -104,6 +104,10 @@ panel.innerHTML = `<button class="gear" type="button" aria-label="Customize">
   <form hidden><h4>Customize</h4>
   ${seg("rows", "Favorite rows", [1, 2])}${seg("per", "Per row", [4, 5, 6, 8])}
   ${seg("bg", "Background", ["aurora", "dusk", "photo", "plain"])}${seg("theme", "Theme", ["dark", "light"])}
+  <fieldset class="adj"><legend>Background overlay</legend>
+    <label>Colour <input type="color" name="ov"></label>
+    <label>Opacity <input type="range" name="ovo" min="0" max="90"></label>
+    <label>Blur <input type="range" name="blur" min="0" max="30"></label></fieldset>
   ${seg("h24", "24-hour clock", [false, true])}${seg("newtab", "Open favorites in new tab", [false, true])}
   <a href="index.html">← All variants</a></form>`;
 panel.onchange = e => {
@@ -111,15 +115,21 @@ panel.onchange = e => {
   S[name] = value === "true" ? true : value === "false" ? false : isNaN(value) ? value : +value;
   save();
 };
+panel.oninput = e => { if (e.target.type === "range" || e.target.type === "color") panel.onchange(e); };
+// Overlay layer between the background and the content; blur uses backdrop-filter here only for the prototype.
+const scrim = document.createElement("div");
+scrim.className = "scrim";
 $(".gear", panel).onclick = () => { const f = $("form", panel); f.hidden = !f.hidden; };
 
 function apply() {
   const d = document.documentElement;
   d.dataset.theme = S.theme; d.dataset.bg = S.bg; d.style.setProperty("--per", S.per);
+  d.style.setProperty("--ov", S.ov); d.style.setProperty("--ovo", S.ovo + "%"); d.style.setProperty("--blur", S.blur + "px");
   renderFavs(); tick();
-  $$("input", panel).forEach(i => i.checked = String(S[i.name]) === i.value);
+  $$("input", panel).forEach(i => i.type === "radio" ? i.checked = String(S[i.name]) === i.value : i.value = S[i.name]);
 }
 
+document.body.prepend(scrim);
 document.body.append(panel);
 apply(); renderWorld(); renderTodos(); renderNotes();
 setInterval(tick, 1000);

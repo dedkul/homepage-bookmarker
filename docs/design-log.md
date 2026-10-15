@@ -42,3 +42,13 @@ All four show the same content so we compare layout only.
 - **Dropped B (Dock) and D (Bento).** D read as a dashboard, not a calm homepage. B pushed favorites far from the centre. (Files kept for the case study.)
 - **World clocks → one optional second time zone.** The user moves between two time zones, so three fixed cities was noise. The main clock is always local time. The second clock can be added, edited (label + IANA zone with autocomplete) or removed inline; Edit appears on hover.
   *Why inline, not in settings:* editing happens right where the clock is, so you don't have to hunt for it.
+
+---
+
+## 2026-10-15 · v0.3 · Three styles, no bookmarks, background overlay
+
+- **Ship three user-selectable styles:** Dock (merged with Focus), Editorial, Bento. *Why:* the user liked all of them; three gives a real choice without overwhelming people. Constraint: each style is a CSS layer over one shared component set, so features are built once.
+- **Bookmarks removed from the roadmap.** Favorites (speed dial) only. *Why:* keeps the product focused and simple.
+- **Video background dropped (pending confirmation).** *Why:* speed is the core promise.
+- **Background overlay:** colour picker + opacity (0–90%) + blur (0–30px). *Why:* fixes photos that are too bright or busy for legible text. *Perf note:* production bakes the blur into the stored image when it's saved, so it costs nothing at runtime. The prototype uses live CSS.
+- **Onboarding planned:** a one-time welcome tab on install. Steps: pick favorites → pick style → background. Each step is skippable.
