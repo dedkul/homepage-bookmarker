@@ -1,0 +1,55 @@
+<!doctype html><html lang="en" data-style="editorial" data-theme="dark" data-bg="dusk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumen · Editorial</title><link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="lumen.css">
+<style>
+.page { min-height: 100vh; display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: auto 1fr; column-gap: 72px; padding: 26px 56px 56px; }
+.mast { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--stroke); }
+.brand { font: italic 400 26px var(--serif); letter-spacing: -.01em; }
+.mast .date { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.hero { align-self: end; }
+.time { font: 400 clamp(150px, 21vw, 340px) / .8 var(--serif); letter-spacing: -.035em; margin-left: -.03em; }
+.ap { font: 500 max(11px, .055em) var(--mono); letter-spacing: .08em; vertical-align: 1.4em; }
+.greet { font: italic 400 clamp(26px, 2.6vw, 38px) var(--serif); margin-top: 22px; color: var(--fg); }
+.side { align-self: end; display: grid; gap: 30px; }
+.side .search { height: 60px; padding: 0; border-radius: 0; background: none; border: 0; border-bottom: 1px solid var(--fg3); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.side .search:focus-within { box-shadow: none; border-color: var(--fg); background: none; }
+.side .search input { font: italic 400 28px var(--serif); }
+/* The favorites become a typographic index */
+.side .favs { grid-template-columns: repeat(2, 1fr); gap: 0 28px; justify-content: stretch; }
+.side .fav { --ico: 26px; width: auto; display: flex; align-items: center; gap: 14px; padding: 12px 2px; border-radius: 0; border-bottom: 1px solid var(--stroke); }
+.side .fav .num { display: block; width: 20px; font: 500 11px var(--mono); color: var(--fg3); }
+.side .ico { border-radius: 8px; box-shadow: none; font-size: 15px; }
+.side .lbl { flex: 1; font: 400 22px var(--serif); color: var(--fg); }
+.side .add { text-align: left; }
+.side .fav::after { content: "↗"; color: var(--fg3); opacity: 0; transform: translate(-6px, 6px); transition: all .45s var(--spring); }
+.side .fav:hover::after, .side .fav:focus-visible::after { opacity: 1; transform: none; color: var(--accent); }
+.side .fav:hover .ico { transform: none; }
+.side .fav:hover .lbl { font-style: italic; }
+.side .fav:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .side .fav:focus-visible .ico { outline: none; }
+
+/* II · Gallery: the background is the artwork; information sits around it like museum labels */
+[data-v="2"] .page { grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; padding: 26px 40px 40px; }
+[data-v="2"] .mast { border: 0; }
+[data-v="2"] .hero { grid-row: 3; }
+[data-v="2"] .time { font-size: clamp(110px, 13vw, 210px); }
+[data-v="2"] .greet { font-size: 24px; margin-top: 14px; color: var(--fg2); }
+[data-v="2"] .side { grid-row: 3; justify-items: end; gap: 22px; margin-right: 60px; }
+[data-v="2"] .side .search { width: 380px; height: 50px; }
+[data-v="2"] .side .search input { font-size: 22px; }
+[data-v="2"] .side .favs { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: calc(var(--per) * 50px); }
+[data-v="2"] .side .fav { --ico: 42px; padding: 0; border: 0; }
+[data-v="2"] .side .fav .num, [data-v="2"] .side .fav::after { display: none; }
+[data-v="2"] .side .ico { background: var(--surface-2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+[data-v="2"] .side .fav:hover .ico { transform: translateY(-4px); }
+[data-v="2"] .side .lbl { position: absolute; bottom: calc(100% + 8px); left: 50%; translate: -50% 0; padding: 4px 9px; border-radius: 7px;
+  font: 500 12px var(--sans); background: var(--fg); color: var(--inv); opacity: 0; transform: translateY(4px); transition: all .35s var(--spring); pointer-events: none; }
+[data-v="2"] .side .fav:hover .lbl, [data-v="2"] .side .fav:focus-visible .lbl { opacity: 1; transform: none; font-style: normal; }
+@media (max-width: 900px) { .page, [data-v="2"] .page { grid-template-columns: 1fr; row-gap: 40px; } [data-v="2"] .side { grid-row: auto; justify-items: start; } }
+</style></head><body>
+<div class="page">
+  <header class="mast"><span class="brand">Lumen</span><span class="date" data-date></span><div data-zone></div></header>
+  <section class="hero"><h1 class="time"><span data-time></span><span class="ap" data-ap></span></h1><p class="greet" data-greet></p></section>
+  <aside class="side">
+    <form class="search " action="https://www.google.com/search" role="search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input name="q" placeholder="Search the web" aria-label="Search the web" autocomplete="off"><kbd>/</kbd></form>
+    <nav class="favs" data-favs aria-label="Favorites"></nav>
+  </aside>
+</div>
+<script src="lumen.js"></script></body></html>

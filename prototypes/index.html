@@ -1,14 +1,13 @@
-<!doctype html><html lang="en" data-theme="dark" data-bg="plain"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="shared.css"><title>Layout Explorations</title><style>
-main{max-width:880px;margin:0 auto;padding:64px 24px;display:grid;gap:28px}
-h1{font-weight:500;font-size:28px}p{color:var(--mute);line-height:1.55}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.grid a{display:grid;gap:8px;padding:22px;color:var(--fg);text-decoration:none}
-.grid a:hover{background:var(--glass-hi)}.grid b{font-size:18px;font-weight:500}
+<!doctype html><html lang="en" data-style="index" data-theme="dark" data-bg="sand"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumen · Prototypes</title><link rel="stylesheet" href="lumen.css"><style>
+html{opacity:1}body{opacity:1!important}main{max-width:980px;margin:0 auto;padding:80px 28px;display:grid;gap:36px}
+h1{font:400 64px/1 var(--serif);letter-spacing:-.02em}h1 em{color:var(--accent)}p{color:var(--fg2);max-width:620px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{display:grid;gap:10px;padding:24px;border-radius:22px;background:var(--surface);border:1px solid var(--stroke);color:var(--fg);text-decoration:none}
+.card:hover{background:var(--surface-2)}.card b{font:400 30px var(--serif)}.card small{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)}
 </style></head><body><main>
-<div><h1>Homepage: layout explorations v0.1</h1><p>Four directions for the same v1 content: clock, world clocks, search, favorites (1 or 2 rows), tasks and notes. Open the slider button (bottom-right) on any page to change rows, items per row, background, theme and link behaviour.</p></div>
+<div><h1>Lumen <em>v0.5</em></h1><p>Three styles, each with two variations. On any page, open <b>Customize</b> (bottom-right) to switch style and variation, rows, background, overlay and theme. Press <kbd>/</kbd> to search.</p></div>
 <div class="grid">
-<a class="glass" href="a-focus.html"><b>A · Focus</b><p>Firefox-style centred stack. Tasks and notes hide in a drawer. Quietest option and closest to a default new tab.</p></a>
-<a class="glass" href="b-dock.html"><b>B · Dock</b><p>Search in the centre, favorites in a macOS-style dock, clocks and tasks around the edges.</p></a>
-<a class="glass" href="c-editorial.html"><b>C · Editorial</b><p>Split layout led by typography. Large serif time and a world-clock list on the left, tools on the right.</p></a>
-<a class="glass" href="d-bento.html"><b>D · Bento</b><p>A grid of widget cards. Most expandable for v2 widgets; also the busiest.</p></a>
-</div></main><script>document.documentElement.dataset.theme=JSON.parse(localStorage.proto||"{}").theme||"dark"</script></body></html>
+<a class="card press" href="dock.html"><small>Style 01</small><b>Dock</b><p>I · Still: centred and calm, with a magnifying dock.<br>II · Horizon: time sits low, and the dock hides until your cursor nears it.</p></a>
+<a class="card press" href="editorial.html"><small>Style 02</small><b>Editorial</b><p>I · Broadsheet: a serif masthead with a typographic index of favorites.<br>II · Gallery: the background is the artwork, with labels at the edges.</p></a>
+<a class="card press" href="bento.html"><small>Style 03</small><b>Bento</b><p>I · Soft: rounded glass tiles with tasks and notes.<br>II · Mono: an instrument panel with a hairline grid and monospaced type.</p></a>
+</div><p><a href="v0.1/index.html" style="color:var(--fg2)">← v0.1 explorations (archive)</a></p></main></body></html>

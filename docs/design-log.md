@@ -60,3 +60,29 @@ All four show the same content so we compare layout only.
 - **Chosen name: Lumen.** *Why:* it's short, easy to say and spell, so people can recommend it out loud. It suggests light and clarity, which fits a calm, fast homepage. It was picked from a shortlist (Cove, Porch, Europa, Hush, Nook).
 - *Risk:* "Lumen" is common in tech. Before publishing, check the Chrome Web Store, domains and trademarks; a fallback is a qualifier like "Lumen Tab".
 - **Confirmed:** video is out of v1 (the settings page shows a "coming soon" hint). The default zones are Sydney + India.
+
+---
+
+## 2026-10-16 · v0.5 · Three styles × two variations, real art direction
+
+**Feedback that triggered this:** v0.1 had potential, but the visual design was low effort. The new bar is Product Hunt / Awwwards quality. The user handed art direction to Claude.
+
+### Art direction
+| Choice | Why |
+|---|---|
+| **Geist** (UI), **Instrument Serif** (display), **Geist Mono** (data) | One modern grotesque, one expressive serif, one mono: enough range for three styles without visual noise. All three are OFL licensed and **bundled in the extension** (~95 KB from disk, no network), so the "system fonts only" rule was revised: same speed, far more character. |
+| Warm palette (ember, plum, sand, sea) instead of neon purple | Neon aurora gradients are a 2023 cliché. Warm tones feel calm and personal, which fits "feel-good". |
+| Subtle film grain over every background | Removes the flat, digital look of gradients, like printed paper. It costs one tiny inline SVG. |
+| Springy press (`scale .94`, overshoot easing), 4px hover lift, staggered entrance | Clicks should feel physical. Motion is short (under 0.7s) and fully disabled under `prefers-reduced-motion`. |
+| Customize as a right side sheet with segmented controls, switches and background swatches | Settings stay one click away without leaving the page; changes preview live. |
+
+### Variations
+- **Dock · I Still:** centred clock, a pill showing the second clock with a day/night dot and the time difference, and a floating dock with macOS-style magnification (the hovered icon and its neighbours grow).
+- **Dock · II Horizon:** the time sits low on the left like a horizon line, and search moves to the top. The dock **auto-hides** and slides up when the cursor nears the bottom edge, pushing the time up. This lets a background photo breathe.
+- **Editorial · I Broadsheet:** a newspaper masthead (brand, date, second clock) over a large serif time. Favorites become a **typographic index** (01, 02… with an arrow on hover).
+- **Editorial · II Gallery:** the background is the artwork. Time, search and favorites sit at the edges like museum labels; favorite names appear as tooltips.
+- **Bento · I Soft:** rounded glass tiles: clock, second clock, favorites, tasks, notes.
+- **Bento · II Mono:** an instrument panel: a hairline grid, Geist Mono everywhere, square corners, no blur or shadow.
+
+### Usability details
+`/` focuses search from anywhere · visible focus rings on everything · Escape closes panels · the second clock is edited inline, with time-zone autocomplete and validation · tasks and notes appear only in Bento, where widgets are the point, and stay off the calm styles · "Video background: Coming soon" appears in settings.

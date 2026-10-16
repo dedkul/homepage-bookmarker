@@ -21,7 +21,7 @@ Lumen is a fast, minimal new-tab page for Chromium browsers (Chrome, Brave, Edge
 **Out of v1:** full bookmark manager and collections (Raindrop-style), weather, accounts, paid features.
 
 ## Running the prototypes
-Open `prototypes/index.html` in a browser. No build step.
+Open `prototypes/index.html` in a browser (or serve the folder: `python3 -m http.server 5173`). No build step. v0.1 explorations are archived in `prototypes/v0.1/`.
 
 ## Planned stack (not set up yet)
 WXT (Manifest V3 extension framework) + TypeScript, with a minimal UI layer for the new-tab page.
