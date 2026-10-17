@@ -86,3 +86,32 @@ All four show the same content so we compare layout only.
 
 ### Usability details
 `/` focuses search from anywhere · visible focus rings on everything · Escape closes panels · the second clock is edited inline, with time-zone autocomplete and validation · tasks and notes appear only in Bento, where widgets are the point, and stay off the calm styles · "Video background: Coming soon" appears in settings.
+
+---
+
+## 2026-10-17 · v0.6 · Figma becomes the source of truth
+
+**Feedback that triggered this:** the Figma file held screenshots, so nothing could be tweaked there. Hands-on testing surfaced four problems: (1) the opacity and blur sliders were hard to drag inside the scrolling sheet; (2) on long scrolls the Customize title and Done button scrolled out of view; (3) favorites couldn't be edited, only opened; (4) Bento had no way to turn Notes off.
+
+### What's in Figma now ([file](https://www.figma.com/design/XVdKJ8do088Mqgk2yfAEHV))
+- **Foundations:** colour variables with Dark and Light modes, radius and spacing variables, 17 text styles, 4 effect styles, and 7 background paint styles. Editing a style updates everything that uses it.
+- **Components:** 13 icons and the following, with variants:
+  - Button, Icon Button, Toggle, Segment, Slider, Swatch, Task, Badge
+  - Search, Favorite, Favorite Add, Zone Chip, Bento Tile, Menu Item
+  - Favorite Menu, Input, Favorite Editor, Toast, Customize Sheet
+- **Screens:** the six v0.5 variations rebuilt from those components (not screenshots), plus Horizon with the dock revealed and Bento Soft/Mono with Notes off.
+- **Interactions:** the sheet open, right-click menu, edit dialog, edit mode with Undo, the Bento notes toggle, and dragging a slider.
+- **Explorations:** Dock III Rail, Dock IV Command, Editorial III Column, Bento III Strip.
+
+### Decisions
+| Change | Why |
+|---|---|
+| Sheet header (title, Done, tabs) is **sticky**, and the content is split into four tabs: Layout · Favorites · Background · General | Done is always one click away, and each tab is short enough that scrolling is rare. |
+| Slider: full-width track, **32px hit area**, live value readout; build uses pointer capture and `touch-action: none` | A 170px native range was a small target, and the sheet scrolled when a drag started on it. |
+| Edit favorites three ways: right-click menu (Open in new tab · Edit · Edit favorites · Remove), **edit mode** (× on each tile, drag to reorder), and the Favorites tab | Discoverable for mouse users, fast for bulk changes. Each opens the same Favorite Editor (link, name, site icon or monogram + colour). |
+| Remove gives an **Undo toast** instead of "Are you sure?" | Confirm dialogs train people to click Yes without reading. Undo is safer and faster. |
+| "Bento widgets" (Tasks, Notes toggles) appear only when Style = Bento; Notes off → grid re-centres vertically and Tasks matches the Favorites height | Settings that don't apply shouldn't be shown. Equal heights keep the grid feeling designed, not missing a piece. |
+
+### Open
+- Animations feel jerky in the HTML prototype; a motion pass happens later (the user's call).
+- The HTML prototype has not been updated to v0.6 yet. Figma is ahead of it, by design.
