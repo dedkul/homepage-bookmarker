@@ -115,3 +115,23 @@ All four show the same content so we compare layout only.
 ### Open
 - Animations feel jerky in the HTML prototype; a motion pass happens later (the user's call).
 - The HTML prototype has not been updated to v0.6 yet. Figma is ahead of it, by design.
+
+---
+
+## 2026-10-18 · v0.7 · Type explorations (impeccable skill)
+
+**Trigger:** the user wanted to push typography further and test whether the `impeccable` design skill changes the output. HTML only, in `prototypes/type/`; nothing moves to Figma until one is picked.
+
+**What the skill changed:** it asked for a `PRODUCT.md` brief first (register: product; personality: calm, crafted, quick; avoid generic SaaS dashboards). Its ban list flagged Instrument Serif (our current display face) and the "serif + mono labels + ruled lines" look (our Editorial style) as overused, so all four directions use new faces. It also pushed for fixed rem type scales, OKLCH colour, 150–250ms ease-out motion with no overshoot, and one font family where possible.
+
+| Direction | Idea | Why it might win |
+|---|---|---|
+| A · Timetable (Archivo) | One family; **width** is the hierarchy: ultra-condensed time, extended labels. Zones as a departure board; favorites numbered 1–8 because the number is the keyboard shortcut | Fastest to scan; the numbers do a job |
+| B · Optical (Bricolage Grotesque) | One family; the **optical-size** axis gives a characterful display cut for the time and monogram icons, and a plain text cut for labels. The second zone is a sentence | Warmest; closest to the current Dock |
+| C · Watch face (Bodoni Moda + Hanken Grotesk) | Didone numerals on an oxblood dial with brass details; a working **sub-dial** with hands for the second zone | Most distinctive and portfolio-worthy |
+| D · Daylight (Recursive) | The time's **weight, casualness and slant follow the sun** (light and casual at night, heavy at noon); a day line shows both zones | Ties the type to the name "Lumen" |
+
+**Deliberate rule break:** impeccable caps display type at 6rem. The clocks go to 13–15rem because the time is the page's one job and is read from across a desk.
+**Open:** fonts load from Google Fonts in the prototypes; the chosen family gets bundled (subset to the glyphs we use). Phone width is not a real target and wasn't fully verified.
+
+**Outcome (2026-10-18): rejected.** The user didn't like any of the four directions, so the files were deleted. Direction stays with v0.6 in Figma.
