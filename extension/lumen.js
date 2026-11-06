@@ -383,7 +383,7 @@ function togglePhoto(p) {
   if (b.photos.length >= MAX_PHOTOS) return toast(`Your set has ${MAX_PHOTOS} photos. Remove one to add another.`);
   b.photos.push(p);
   if (b.photos.length === 1) { b.cur = 0; b.at = Date.now(); }
-  if (p.dl && window.LUMEN_UNSPLASH_KEY) fetch(p.dl, { headers: { Authorization: 'Client-ID ' + window.LUMEN_UNSPLASH_KEY } }).catch(() => {});
+  if (p.dl) fetch(`${LUMEN_API}/api/unsplash?dl=${encodeURIComponent(p.dl)}`).catch(() => {});
   photoSetChanged();
 }
 function removePhoto(i) {
@@ -406,19 +406,15 @@ function loadLazyScripts() {
   // Only the settings window needs these, so they never cost the new tab anything.
   if (lazyP) return lazyP; if (lazyLoaded) return Promise.resolve(); lazyLoaded = true;
   const load = (src) => new Promise((r) => { const el = document.createElement('script'); el.src = src; el.onload = el.onerror = r; document.head.append(el); });
-  return (lazyP = Promise.all([load('config.local.js')]));
+  return (lazyP = Promise.all([].map(load))); // no lazy scripts right now
 }
+// The Unsplash key lives in the Vercel proxy (proxy/api/unsplash.js), never in the extension.
+const LUMEN_API = 'https://lumen-api.vercel.app';
 async function searchUnsplash(q) {
-  const key = window.LUMEN_UNSPLASH_KEY;
-  if (key) {
-    const r = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(q || 'wallpaper')}&per_page=18&orientation=landscape&content_filter=high`, { headers: { Authorization: 'Client-ID ' + key, 'Accept-Version': 'v1' } });
-    if (r.status === 429 || r.headers.get('X-Ratelimit-Remaining') === '0') throw Object.assign(new Error('Unsplash limit'), { limited: true });
-    if (!r.ok) throw new Error('Unsplash ' + r.status);
-    return (await r.json()).results.map((p) => ({ id: 'us_' + p.id, source: 'unsplash', thumb: p.urls.small, src: p.urls.raw + '&w=2560&q=80&fm=jpg&fit=max', color: p.color, credit: { name: p.user.name, link: p.user.links.html }, dl: p.links.download_location }));
-  }
-  // No key: Picsum's list serves real Unsplash photos with credits (no search).
-  const r = await fetch(`https://picsum.photos/v2/list?page=${1 + Math.floor(Math.random() * 30)}&limit=18`);
-  return (await r.json()).map((p) => ({ id: 'ps_' + p.id, source: 'unsplash', thumb: `https://picsum.photos/id/${p.id}/400/250`, src: `https://picsum.photos/id/${p.id}/2560/1600`, color: '#222', credit: { name: p.author, link: p.url } }));
+  const r = await fetch(`${LUMEN_API}/api/unsplash?q=${encodeURIComponent(q || 'wallpaper')}`);
+  if (r.status === 429 || r.headers.get('X-Ratelimit-Remaining') === '0') throw Object.assign(new Error('Unsplash limit'), { limited: true });
+  if (!r.ok) throw new Error('Unsplash ' + r.status);
+  return (await r.json()).results.map((p) => ({ id: 'us_' + p.id, source: 'unsplash', thumb: p.urls.small, src: p.urls.raw + '&w=2560&q=80&fm=jpg&fit=max', color: p.color, credit: { name: p.user.name, link: p.user.links.html }, dl: p.links.download_location }));
 }
 // Live search goes through serve.py (Wallhaven sends no CORS headers; the extension uses
 // host_permissions instead). Without serve.py, and in Figma capture states, saved results are used.
@@ -594,8 +590,7 @@ const PANE = {
   // Search runs on Enter, not on every keystroke: the Unsplash demo key allows 50 requests an hour.
   unsplash: () => `${searchBox('data-usearch', ui.uq, 'Search Unsplash')}
     <div class="chips">${['Nature', 'Minimal', 'Architecture', 'Ocean', 'Mountains', 'Night'].map((c) => `<button class="chip${ui.uq === c ? ' on' : ''}" data-uchip="${c}">${c}</button>`).join('')}</div>
-    <div class="rgrid" id="results" aria-live="polite"><span class="desc">Loading…</span></div>
-    <p class="note-line">${window.LUMEN_UNSPLASH_KEY ? 'Live Unsplash search.' : 'No Unsplash key found in config.local.js, so this shows a random page of Unsplash photos via Picsum (search is ignored).'}</p>`,
+    <div class="rgrid" id="results" aria-live="polite"><span class="desc">Loading…</span></div>`,
   wallhaven: () => `${searchBox('data-wsearch', ui.wq, 'Search Wallhaven')}
     <div class="chips">${['landscape', 'minimal', 'space', 'city'].map((c) => `<button class="chip${ui.wq === c ? ' on' : ''}" data-wchip="${c}">${c[0].toUpperCase() + c.slice(1)}</button>`).join('')}</div>
     <div class="rgrid" id="wresults" aria-live="polite"><span class="desc">Searching…</span></div>
