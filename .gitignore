@@ -5,3 +5,6 @@ dist/
 .wxt/
 *.zip
 .env*
+
+# Local secrets (never commit)
+prototypes/config.local.js

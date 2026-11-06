@@ -1,13 +1,65 @@
-<!doctype html><html lang="en" data-style="index" data-theme="dark" data-bg="sand"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumen · Prototypes</title><link rel="stylesheet" href="lumen.css"><style>
-html{opacity:1}body{opacity:1!important}main{max-width:980px;margin:0 auto;padding:80px 28px;display:grid;gap:36px}
-h1{font:400 64px/1 var(--serif);letter-spacing:-.02em}h1 em{color:var(--accent)}p{color:var(--fg2);max-width:620px;line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.card{display:grid;gap:10px;padding:24px;border-radius:22px;background:var(--surface);border:1px solid var(--stroke);color:var(--fg);text-decoration:none}
-.card:hover{background:var(--surface-2)}.card b{font:400 30px var(--serif)}.card small{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)}
-</style></head><body><main>
-<div><h1>Lumen <em>v0.5</em></h1><p>Three styles, each with two variations. On any page, open <b>Customize</b> (bottom-right) to switch style and variation, rows, background, overlay and theme. Press <kbd>/</kbd> to search.</p></div>
-<div class="grid">
-<a class="card press" href="dock.html"><small>Style 01</small><b>Dock</b><p>I · Still: centred and calm, with a magnifying dock.<br>II · Horizon: time sits low, and the dock hides until your cursor nears it.</p></a>
-<a class="card press" href="editorial.html"><small>Style 02</small><b>Editorial</b><p>I · Broadsheet: a serif masthead with a typographic index of favorites.<br>II · Gallery: the background is the artwork, with labels at the edges.</p></a>
-<a class="card press" href="bento.html"><small>Style 03</small><b>Bento</b><p>I · Soft: rounded glass tiles with tasks and notes.<br>II · Mono: an instrument panel with a hairline grid and monospaced type.</p></a>
-</div><p><a href="v0.1/index.html" style="color:var(--fg2)">← v0.1 explorations (archive)</a></p></main></body></html>
+<!doctype html>
+<html lang="en" data-layout="editorial" data-mode="color" data-tone="dark" data-dock="bottom">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Tab</title>
+<link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/geist-serif.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="lumen.css">
+<script>
+/* Boot: runs before first paint. Reads saved state synchronously, sets layout/mode
+   attributes and the wallpaper, so the first frame is already correct. Rotates the
+   shuffle to the wallpaper that was picked (and pre-cached) on the previous tab. */
+(function () {
+  var d = document.documentElement, s = null;
+  var demo = window.__lumenPreset; // figma.html passes a fixed state and nothing is saved
+  try { s = demo || JSON.parse(localStorage.getItem('lumen.v09')); } catch (e) {}
+  s = s || {};
+  var bg = s.bg || {}, dk = s.dock || {};
+  d.dataset.layout = s.layout || 'editorial';
+  d.dataset.dock = dk.pos || 'bottom';
+  if (dk.autohide) d.dataset.autohide = '';
+  var mode = bg.mode || 'color', photos = bg.photos || [];
+  var color = bg.color || (mode === 'light' ? '#f7f7f5' : '#111113');
+  if (mode !== 'photo' || !photos.length) mode = 'color';
+  d.dataset.mode = mode;
+  d.style.setProperty('--solid', color);
+  d.dataset.glass = bg.glass === false ? 'solid' : (bg.glass == null || bg.glass === true) ? 'frost' : bg.glass;
+  d.dataset.surface = bg.surface || 'black';
+  d.style.setProperty('--frost', bg.frost == null ? 0.5 : bg.frost);
+  // Text tone: dark text on light colors, light text otherwise (same rule as toneOf in lumen.js).
+  var tone = 'dark';
+  if (mode === 'color') {
+    var n = parseInt(color.slice(1), 16), ch = [n >> 16, (n >> 8) & 255, n & 255].map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    var L = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+    if ((L + 0.05) / 0.0603 > 0.896 / (L + 0.05)) tone = 'light';
+  }
+  d.dataset.tone = tone;
+  if (mode === 'photo') {
+    var now = Date.now(), per = { tab: 0, hour: 36e5, day: 864e5 }[bg.freq || 'tab'];
+    if (bg.next != null && bg.next < photos.length && (per === 0 || now - (bg.at || 0) >= per)) {
+      bg.cur = bg.next; bg.at = now; bg.next = null;
+      try { var n = localStorage.getItem('lumen.img.next'); if (n) localStorage.setItem('lumen.img.cur', n); } catch (e) {}
+      if (!demo) try { localStorage.setItem('lumen.v09', JSON.stringify(s)); } catch (e) {}
+    }
+    if (!(bg.cur < photos.length)) bg.cur = 0;
+    var p = photos[bg.cur], src = p.src;
+    if (p.source === 'upload') {
+      try { var c = JSON.parse(localStorage.getItem('lumen.img.cur') || 'null'); src = c && c.id === p.id ? c.data : null; } catch (e) { src = null; }
+    }
+    d.style.setProperty('--pc', p.color || '#111113');
+    d.style.setProperty('--dim', bg.dim == null ? 0.3 : bg.dim);
+    if (src) d.style.setProperty('--photo', 'url("' + src + '")');
+  }
+  window.__lumen = s;
+})();
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<script src="lumen.js"></script>
+</body>
+</html>
