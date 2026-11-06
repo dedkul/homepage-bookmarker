@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Lumen",
+  "version": "0.1.0",
+  "description": "A calm, fast new tab with your favorite sites, a clock, notes and your own wallpapers.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

@@ -1,0 +1,46 @@
+/* Boot: runs before first paint. Reads saved state synchronously, sets layout/mode
+   attributes and the wallpaper, so the first frame is already correct. Rotates the
+   shuffle to the wallpaper that was picked (and pre-cached) on the previous tab. */
+(function () {
+  var d = document.documentElement, s = null;
+  var demo = window.__lumenPreset; // figma.html passes a fixed state and nothing is saved
+  try { s = demo || JSON.parse(localStorage.getItem('lumen.v09')); } catch (e) {}
+  s = s || {};
+  var bg = s.bg || {}, dk = s.dock || {};
+  d.dataset.layout = s.layout || 'editorial';
+  d.dataset.dock = dk.pos || 'bottom';
+  if (dk.autohide) d.dataset.autohide = '';
+  var mode = bg.mode || 'color', photos = bg.photos || [];
+  var color = bg.color || (mode === 'light' ? '#f7f7f5' : '#111113');
+  if (mode !== 'photo' || !photos.length) mode = 'color';
+  d.dataset.mode = mode;
+  d.style.setProperty('--solid', color);
+  d.dataset.glass = bg.glass === false ? 'solid' : (bg.glass == null || bg.glass === true) ? 'frost' : bg.glass;
+  d.dataset.surface = bg.surface || 'black';
+  d.style.setProperty('--frost', bg.frost == null ? 0.5 : bg.frost);
+  // Text tone: dark text on light colors, light text otherwise (same rule as toneOf in lumen.js).
+  var tone = 'dark';
+  if (mode === 'color') {
+    var n = parseInt(color.slice(1), 16), ch = [n >> 16, (n >> 8) & 255, n & 255].map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    var L = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+    if ((L + 0.05) / 0.0603 > 0.896 / (L + 0.05)) tone = 'light';
+  }
+  d.dataset.tone = tone;
+  if (mode === 'photo') {
+    var now = Date.now(), per = { tab: 0, hour: 36e5, day: 864e5 }[bg.freq || 'tab'];
+    if (bg.next != null && bg.next < photos.length && (per === 0 || now - (bg.at || 0) >= per)) {
+      bg.cur = bg.next; bg.at = now; bg.next = null;
+      try { var n = localStorage.getItem('lumen.img.next'); if (n) localStorage.setItem('lumen.img.cur', n); } catch (e) {}
+      if (!demo) try { localStorage.setItem('lumen.v09', JSON.stringify(s)); } catch (e) {}
+    }
+    if (!(bg.cur < photos.length)) bg.cur = 0;
+    var p = photos[bg.cur], src = p.src;
+    if (p.source === 'upload') {
+      try { var c = JSON.parse(localStorage.getItem('lumen.img.cur') || 'null'); src = c && c.id === p.id ? c.data : null; } catch (e) { src = null; }
+    }
+    d.style.setProperty('--pc', p.color || '#111113');
+    d.style.setProperty('--dim', bg.dim == null ? 0.3 : bg.dim);
+    if (src) d.style.setProperty('--photo', 'url("' + src + '")');
+  }
+  window.__lumen = s;
+})();
