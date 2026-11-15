@@ -439,9 +439,8 @@ async function searchWallhaven(q) {
 
 /* ---------- Settings window ---------- */
 const ui = { sec: 'Layout', bgTab: 'mine', uq: '', wq: 'landscape', results: null, drag: null };
-// Wallhaven is off until Unsplash approves the production key: a second, user-uploaded source could
-// count against the application. The code stays; flip this to bring the tab back.
-const WALLHAVEN = false;
+// Wallhaven was off until Unsplash approved the production key (2026-11-14). Flip to hide the tab again.
+const WALLHAVEN = true;
 const CLOCK_FONTS = [['serif', 'Serif'], ['sans', 'Sans'], ['pixel', 'Pixel'], ['dot', 'Dot']];
 // Clock lives inside Layout (v0.9.11): its options depend on the layout, and alone it was a thin tab.
 const SECTIONS = ['Layout', 'Background', 'Favorites', 'Search', 'Notes'];
@@ -590,7 +589,8 @@ const PANE = {
       ${sliderRow('Dim', 'Keeps text readable on bright photos.', 'bg.dim', 0, 0.7, 0.05)}
       ${b.photos.length > 1 ? row('Shuffle now', 'Skips to the next photo in your set.', '<div class="ctl"><button class="btn" data-act="next-photo">Next photo</button></div>') : ''}`;
   },
-  // Search runs on Enter, not on every keystroke: the Unsplash demo key allows 50 requests an hour.
+  // Search runs as you type (500 ms after the last key, 3+ characters) or on Enter. All Lumen users share
+  // one Unsplash allowance (1,000 an hour), so the pause keeps searches few.
   unsplash: () => `${searchBox('data-usearch', ui.uq, 'Search Unsplash')}
     <div class="chips">${['Nature', 'Minimal', 'Architecture', 'Ocean', 'Mountains', 'Night'].map((c) => `<button class="chip${ui.uq === c ? ' on' : ''}" data-uchip="${c}">${c}</button>`).join('')}</div>
     <div class="rgrid" id="results" aria-live="polite"><span class="desc">Loading…</span></div>
@@ -638,19 +638,21 @@ async function fillUnsplash(fresh) {
   const box = $('#results'); if (!box) return;
   if (ui.results && !fresh) { box.innerHTML = results(ui.results, ui.uq); return; }
   box.innerHTML = '<span class="desc">Searching…</span>';
-  try { ui.results = await searchUnsplash(ui.uq); if ($('#results')) $('#results').innerHTML = results(ui.results, ui.uq); }
-  catch (e) { if ($('#results')) $('#results').innerHTML = `<div class="err"><span class="desc">Unable to load photos. Check your connection and try again.</span><button class="btn" data-act="retry-unsplash">Try again</button></div>`; }
+  const q = ui.uq; // while typing, a slower earlier search must not overwrite a newer one
+  try { const list = await searchUnsplash(q); if (q !== ui.uq) return; ui.results = list; if ($('#results')) $('#results').innerHTML = results(list, q); }
+  catch (e) { if (q !== ui.uq) return; if ($('#results')) $('#results').innerHTML = `<div class="err"><span class="desc">Unable to load photos. Check your connection and try again.</span><button class="btn" data-act="retry-unsplash">Try again</button></div>`; }
 }
 async function fillWallhaven(fresh) {
   const box = $('#wresults'); if (!box) return;
   if (ui.wres && !fresh) { box.innerHTML = results(ui.wres, ui.wq); return; }
   box.innerHTML = '<span class="desc">Searching…</span>';
+  const q = ui.wq;
   try {
-    ui.wres = await searchWallhaven(ui.wq);
-    if ($('#wresults')) $('#wresults').innerHTML = results(ui.wres, ui.wq);
+    const list = await searchWallhaven(q); if (q !== ui.wq) return; ui.wres = list;
+    if ($('#wresults')) $('#wresults').innerHTML = results(list, q);
     if (ui.wcanned && $('#wnote')) $('#wnote').textContent = 'Saved results only (Landscape, Minimal, Space, City). Run python3 serve.py for live search.';
   } catch (e) {
-    if (!$('#wresults')) return;
+    if (q !== ui.wq || !$('#wresults')) return;
     $('#wresults').innerHTML = e.noServer
       ? `<div class="noresults"><span>Live Wallhaven search needs the prototype server</span><span class="desc">This tab isn’t running on it, so only Landscape, Minimal, Space and City work. Run <code>python3 serve.py</code> in the prototypes folder and open <a class="link" href="http://localhost:5173/">localhost:5173</a>. The extension won’t need this.</span></div>`
       : `<div class="err"><span class="desc">Wallhaven didn’t answer. Check your connection and try again.</span><button class="btn" data-act="retry-wallhaven">Try again</button></div>`;
@@ -803,8 +805,8 @@ document.addEventListener('submit', (e) => {
     const url = ENGINES[s.search.engine][1] + encodeURIComponent(q);
     s.search.newTab ? window.open(url, '_blank', 'noopener') : (location.href = url);
   } else if (f.matches('[data-favrow]')) { saveFav(f);
-  } else if (f.matches('[data-usearch]')) { ui.uq = f.q.value.trim(); ui.results = null; syncChips('data-uchip', ui.uq); fillUnsplash(true); }
-  else if (f.matches('[data-wsearch]')) { ui.wq = f.q.value.trim(); ui.wres = null; syncChips('data-wchip', ui.wq); fillWallhaven(true); }
+  } else if (f.matches('[data-usearch]')) { clearTimeout(ui.typing); ui.uq = f.q.value.trim(); ui.results = null; syncChips('data-uchip', ui.uq); fillUnsplash(true); }
+  else if (f.matches('[data-wsearch]')) { clearTimeout(ui.typing); ui.wq = f.q.value.trim(); ui.wres = null; syncChips('data-wchip', ui.wq); fillWallhaven(true); }
 });
 document.addEventListener('change', (e) => {
   const t = e.target;
@@ -828,6 +830,11 @@ document.addEventListener('input', (e) => {
     if (m) { it.k = true; it.d = /x/i.test(m[0]); it.t = t.value.slice(m[0].length); save(); render(); return focusNote(+t.dataset.note); }
     it.t = t.value; save(false); grow(t);
     t.previousElementSibling.innerHTML = md(it.t); // keeps the rendered copy current for when you leave the line
+  }
+  if (t.form?.matches('[data-usearch], [data-wsearch]')) {
+    // Search as you type: wait for a pause, and skip one- and two-letter words. Enter still searches at once.
+    clearTimeout(ui.typing); const f = t.form, q = t.value.trim();
+    if (q.length >= 3) ui.typing = setTimeout(() => { if (f.isConnected) f.requestSubmit(); }, 500);
   }
   if (t.name === 'url' && t.form?.dataset.favrow != null) { t.form.name.placeholder = autoName(t.value.trim()) || 'Name'; if ($('#ferr')) { $('#ferr').remove(); t.removeAttribute('aria-invalid'); } }
   if (t.dataset.range) {

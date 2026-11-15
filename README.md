@@ -2,7 +2,7 @@
 
 A calm, fast new tab for Chrome. Your favorite sites, a clock, notes, and a wallpaper you choose. Nothing else.
 
-**Status:** the extension is built and works as an unpacked extension. It isn't in the Chrome Web Store yet: Unsplash production approval and store review are still pending.
+**Status:** the extension is built and works as an unpacked extension. It isn't in the Chrome Web Store yet: Unsplash approved it for production on 14 November 2026; store review is still pending.
 
 ## Why it exists
 Nobody stares at a new tab. You glance at it for a second before you type. Lumen is designed for that glance, and that one idea set three rules:
@@ -16,11 +16,11 @@ Nobody stares at a new tab. You glance at it for a second before you type. Lumen
 - Clock (large, small or off) with four faces from the Geist family, plus an optional second time zone
 - Search bar and up to 12 favorites
 - Notes, with optional tasks (type `[ ]` at the start of a line) and simple formatting
-- Backgrounds: solid colours, or photos from Unsplash search and your own uploads, shuffled from a set of up to 10
+- Backgrounds: solid colours, or photos from Unsplash and Wallhaven search and your own uploads, shuffled from a set of up to 10
 - Frosted, liquid or solid surfaces
 
 ## Privacy
-No accounts, no analytics, no ads. Favorites, notes, settings and uploaded photos stay in your browser. Unsplash search goes through a small server proxy (`proxy/`), so the extension ships no API key.
+No accounts, no analytics, no ads. Favorites, notes, settings and uploaded photos stay in your browser. Unsplash and Wallhaven search go through a small server proxy (`proxy/`), so the extension ships no API key and needs no extra permissions.
 
 ## Install (unpacked)
 1. Clone this repo.
@@ -32,7 +32,7 @@ No accounts, no analytics, no ads. Favorites, notes, settings and uploaded photo
 | Path | What it is |
 | --- | --- |
 | `extension/` | The Manifest V3 extension: plain HTML, CSS and JS with no build step |
-| `proxy/` | The Unsplash proxy, a single Vercel function that keeps the API key off the extension |
+| `proxy/` | The photo-search proxy: two Vercel functions, Unsplash (keeps the API key off the extension) and Wallhaven (its API has no CORS) |
 | `prototypes/` | The HTML prototype the extension was ported from. Run `python3 serve.py` inside it, then open http://localhost:5173 |
 | `docs/design-log.md` | Every design decision and the reasoning behind it |
 
