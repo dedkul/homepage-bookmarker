@@ -151,7 +151,7 @@ svg { width: 16px; height: 16px; flex: none; }
 .st .tile { width: 40px; height: 40px; }
 
 /* Photo credit */
-.credit { position: fixed; z-index: 3; left: var(--pad); bottom: 18px; color: var(--mute); }
+.credit { position: fixed; z-index: 5; left: var(--pad); bottom: 18px; color: var(--mute); }
 .credit a { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--faint); }
 [data-layout=strip] .credit { bottom: 106px; }
 [data-layout=editorial] .credit { left: auto; right: var(--pad); bottom: 18px; }

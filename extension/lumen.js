@@ -409,7 +409,7 @@ function loadLazyScripts() {
   return (lazyP = Promise.all([].map(load))); // no lazy scripts right now
 }
 // The Unsplash key lives in the Vercel proxy (proxy/api/unsplash.js), never in the extension.
-const LUMEN_API = 'https://lumen-api.vercel.app';
+const LUMEN_API = 'https://lumen-api-delta.vercel.app';
 async function searchUnsplash(q) {
   const r = await fetch(`${LUMEN_API}/api/unsplash?q=${encodeURIComponent(q || 'wallpaper')}`);
   if (r.status === 429 || r.headers.get('X-Ratelimit-Remaining') === '0') throw Object.assign(new Error('Unsplash limit'), { limited: true });
