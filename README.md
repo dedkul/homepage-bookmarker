@@ -1,30 +1,43 @@
 # Lumen
 
-Lumen is a fast, minimal new-tab page for Chromium browsers (Chrome, Brave, Edge, Arc, Vivaldi).
+A calm, fast new tab for Chrome. Your favorite sites, a clock, notes, and a wallpaper you choose. Nothing else.
 
-**Status:** design phase. We are iterating on HTML prototypes in `prototypes/`. Production code starts only after the layout is final.
+**Status:** the extension is built and works as an unpacked extension. It isn't in the Chrome Web Store yet: Unsplash production approval and store review are still pending.
 
-## Product principles
-1. **As fast as the browser's default new tab.** No network requests on load, a tiny JS bundle, system fonts, and media pre-compressed when uploaded.
-2. **Minimal and calm.** Every widget can be hidden; the default is close to empty.
-3. **Your data stays yours.** Stored locally, with export/import. No account and no backend.
+## Why it exists
+Nobody stares at a new tab. You glance at it for a second before you type. Lumen is designed for that glance, and that one idea set three rules:
 
-## v1 scope
-- Clock and world clocks
-- Search bar
-- Favorites / speed dial (1 or 2 rows, configurable items per row, open in same or new tab)
-- Tasks and notes (exploring)
-- Custom background: gradient, image (auto-compressed), video (limited)
-- Toolbar popup: save the current site to Favorites
-- Export / import (JSON); optional `chrome.storage.sync` for settings and favorites
+1. **Load instantly.** A small boot script paints the saved layout and wallpaper before the first frame. The next wallpaper is pre-loaded during idle time, so a shuffle never waits on the network.
+2. **Ask nothing.** Every feature has one way in. Favorites, for example, are added and edited in one place: Settings › Favorites.
+3. **Look calm.** Wallpaper first, information at the edges.
 
-**Out of v1:** full bookmark manager and collections (Raindrop-style), weather, accounts, paid features.
+## Features
+- Three layouts: **Dock** (bottom, left or right, with optional auto-hide and one or two rows), **Editorial** and **Strip**
+- Clock (large, small or off) with four faces from the Geist family, plus an optional second time zone
+- Search bar and up to 12 favorites
+- Notes, with optional tasks (type `[ ]` at the start of a line) and simple formatting
+- Backgrounds: solid colours, or photos from Unsplash search and your own uploads, shuffled from a set of up to 10
+- Frosted, liquid or solid surfaces
 
-## Running the prototypes
-Open `prototypes/index.html` in a browser (or serve the folder: `python3 -m http.server 5173`). No build step. v0.1 explorations are archived in `prototypes/v0.1/`.
+## Privacy
+No accounts, no analytics, no ads. Favorites, notes, settings and uploaded photos stay in your browser. Unsplash search goes through a small server proxy (`proxy/`), so the extension ships no API key.
 
-## Planned stack (not set up yet)
-WXT (Manifest V3 extension framework) + TypeScript, with a minimal UI layer for the new-tab page.
+## Install (unpacked)
+1. Clone this repo.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and pick the `extension/` folder.
+4. Open a new tab.
 
-## Docs
-- [Design log](docs/design-log.md): every iteration and the reasoning behind each decision. Mirrors the [Figma case-study file](https://www.figma.com/design/XVdKJ8do088Mqgk2yfAEHV).
+## Repo layout
+| Path | What it is |
+| --- | --- |
+| `extension/` | The Manifest V3 extension: plain HTML, CSS and JS with no build step |
+| `proxy/` | The Unsplash proxy, a single Vercel function that keeps the API key off the extension |
+| `prototypes/` | The HTML prototype the extension was ported from. Run `python3 serve.py` inside it, then open http://localhost:5173 |
+| `docs/design-log.md` | Every design decision and the reasoning behind it |
+
+## How it was made
+Lumen was designed in the browser: the HTML prototype, not Figma, became the source of truth, because Figma couldn't show the details that matter on a page you see for one second. It was built with [Claude](https://claude.com/claude-code) as an AI pair. I set the direction, judged what came back and rejected what didn't meet the bar.
+
+- [Design log](docs/design-log.md)
+- [Figma explorations](https://www.figma.com/design/XVdKJ8do088Mqgk2yfAEHV): the shipped product was designed in the browser, so these screens are explorations, not the spec.
