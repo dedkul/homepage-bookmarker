@@ -34,8 +34,10 @@ export async function GET(request) {
 
   const q = (params.get('q') || 'wallpaper').slice(0, 100);
   const r = await fetch(`${API}/search/photos?query=${encodeURIComponent(q)}&per_page=18&orientation=landscape&content_filter=high`, { headers: auth });
+  // Successful searches are cached at Vercel's edge for an hour: every Lumen user shares one
+  // 1,000-an-hour allowance, and popular searches (the preset chips) then cost it nothing.
   return new Response(await r.text(), {
     status: r.status,
-    headers: { ...cors, 'Content-Type': 'application/json', 'X-Ratelimit-Remaining': r.headers.get('X-Ratelimit-Remaining') || '' },
+    headers: { ...cors, 'Content-Type': 'application/json', 'X-Ratelimit-Remaining': r.headers.get('X-Ratelimit-Remaining') || '', ...(r.ok ? { 'Cache-Control': 'public, s-maxage=3600' } : {}) },
   });
 }
