@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: transparent; }
+  .i { position: relative; width: var(--s); height: var(--s); }
+  .tile { position: absolute; inset: var(--pad); border-radius: 22%; background: #0a0a0b; overflow: hidden;
+          display: grid; place-items: center; }
+  /* the glow: a soft warm light sitting behind the letter */
+  .tile::before { content: ""; position: absolute; inset: 0;
+          background: radial-gradient(circle at 50% 58%, rgba(255, 196, 120, .30), rgba(255, 170, 90, .08) 38%, transparent 62%); }
+  .L { position: relative; font: 400 calc((var(--s) - 2 * var(--pad)) * .66)/1 Georgia, serif; color: #f6efe3;
+       transform: translate(2%, 3%);
+       text-shadow: 0 0 calc(var(--s) * .05) rgba(255, 200, 130, .55); }
+  .small .tile::before { opacity: .6; }
+  .small .L { text-shadow: none; font-weight: 700; }
+</style>
+<div class="i" id="i"><div class="tile"><span class="L">L</span></div></div>
+<script>
+  const p = new URLSearchParams(location.search), s = +p.get('s') || 128, pad = +(p.get('pad') || 0);
+  document.documentElement.style.setProperty('--s', s + 'px');
+  document.documentElement.style.setProperty('--pad', pad + 'px');
+  if (s <= 32) document.getElementById('i').classList.add('small');
+</script>
