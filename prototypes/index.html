@@ -19,7 +19,8 @@
   var bg = s.bg || {}, dk = s.dock || {};
   d.dataset.layout = s.layout || 'editorial';
   d.dataset.dock = dk.pos || 'bottom';
-  if (dk.autohide) d.dataset.autohide = '';
+  if (dk.autohide && dk.pos !== 'center') d.dataset.autohide = '';
+  d.dataset.fsize = s.favSize || 'm';
   var mode = bg.mode || 'color', photos = bg.photos || [];
   var color = bg.color || (mode === 'light' ? '#f7f7f5' : '#111113');
   if (mode !== 'photo' || !photos.length) mode = 'color';

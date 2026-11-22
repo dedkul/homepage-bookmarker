@@ -14,5 +14,11 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  },
+  "permissions": [
+    "search"
+  ],
+  "optional_host_permissions": [
+    "https://duckduckgo.com/*"
+  ]
 }
