@@ -353,3 +353,9 @@ In the prototype and the extension.
 - **Custom icon upload shipped to the extension.** Collections stay in the prototype until there are wallpapers to put in them.
 - **Editing a favorite keeps its whole address.** The field used to show only the domain, so saving lost the path.
 - **Geist and Lucide licence notices ship in the extension**, as both licences require.
+
+## v0.9.16 · Store prep (2026-11-23)
+- **The second clock is off for new users.** *Why:* it defaulted to Kolkata, the maker's city, for everyone. Existing users keep their setting.
+- **Photographer names on Unsplash search results are links** to their profiles, shown on hover. *Why:* Unsplash's guidelines ask that every shown photo links to its photographer. The link sits beside the thumbnail button, not inside it, so clicking the photo still picks it.
+- **`collections/` added** for the wallpaper sets to come, with the folder layout in its README. Nothing in it ships yet.
+- **Store listing, privacy answers and five 1280 × 800 screenshots** are in `store/`.
