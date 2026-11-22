@@ -12,7 +12,7 @@ const DEF = {
   layout: 'editorial',
   dock: { pos: 'bottom', autohide: false, rows: 1 },
   bg: { mode: 'color', color: '#111113', saved: [], glass: 'frost', surface: 'black', frost: 0.5, photos: [], freq: 'tab', dim: 0.3, cur: 0, at: 0, next: null },
-  clock: { show: 'large', h24: false, zone2: true, tz: 'Asia/Kolkata', font: 'serif' },
+  clock: { show: 'large', h24: false, zone2: false, tz: 'Asia/Kolkata', font: 'serif' },
   favs: [
     ['YouTube', 'https://youtube.com'], ['Gmail', 'https://mail.google.com'], ['GitHub', 'https://github.com'],
     ['Figma', 'https://figma.com'], ['Instagram', 'https://instagram.com'], ['Notion', 'https://notion.so'],
@@ -762,7 +762,9 @@ function favRow(i) {
 }
 const grid = (list) => list.map((p) => {
   const inSet = s.bg.photos.some((x) => x.id === p.id);
-  return `<button class="ph" style="background-image:url('${esc(p.thumb)}')" data-pick='${esc(JSON.stringify(p))}' aria-pressed="${inSet}">${inSet ? '<span class="ok">' + MARK.check + '</span>' : ''}${p.credit ? `<span class="by">${esc(p.credit.name)}</span>` : ''}</button>`;
+  const btn = `<button class="ph" style="background-image:url('${esc(p.thumb)}')" data-pick='${esc(JSON.stringify(p))}' aria-pressed="${inSet}">${inSet ? '<span class="ok">' + MARK.check + '</span>' : ''}</button>`;
+  // Unsplash asks that every shown photo links to its photographer, so the name is a link beside the button, not inside it
+  return p.credit ? `<div class="cell">${btn}<a class="by" href="${esc(utm(p.credit.link))}" target="_blank" rel="noopener">${esc(p.credit.name)}</a></div>` : btn;
 }).join('');
 const PANE = {
   mine: () => {
