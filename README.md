@@ -14,13 +14,15 @@ Nobody stares at a new tab. You glance at it for a second before you type. Lumen
 ## Features
 - Three layouts: **Dock** (bottom, left or right, with optional auto-hide and one or two rows), **Editorial** and **Strip**
 - Clock (large, small or off) with four faces from the Geist family, plus an optional second time zone
-- Search bar and up to 12 favorites
-- Notes, with optional tasks (type `[ ]` at the start of a line) and simple formatting
+- Search with your browser's default engine, bangs to search one site (`!yt lofi`), past searches and optional suggestions
+- Up to 12 favorites, with the site’s icon or your own image
+- Optional weather, from [Open-Meteo](https://open-meteo.com/)
+- Notes with tasks (`[ ]`), toggles (`>`), headings (`#`) and saved links
 - Backgrounds: solid colours, or photos from Unsplash and Wallhaven search and your own uploads, shuffled from a set of up to 10
 - Frosted, liquid or solid surfaces
 
 ## Privacy
-No accounts, no analytics, no ads. Favorites, notes, settings and uploaded photos stay in your browser. Unsplash and Wallhaven search go through a small server proxy (`proxy/`), so the extension ships no API key and needs no extra permissions.
+No accounts, no analytics, no ads. Notes, settings, past searches and uploaded photos are stored in your browser. Site names go to an icon service, and search, weather, suggestions and wallpapers use outside services: [PRIVACY.md](PRIVACY.md) lists each one. Unsplash and Wallhaven search go through a small server proxy (`proxy/`), so the extension ships no API key.
 
 ## Install (unpacked)
 1. Clone this repo.

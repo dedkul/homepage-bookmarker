@@ -122,19 +122,18 @@ svg { width: 16px; height: 16px; flex: none; }
 .tile.add { color: var(--mute); font-size: var(--md); }
 /* Dock tiles shrink (down to 30px) when a side dock would be taller than the window, or a bottom
    dock wider: 12 favorites need 590px at full size, 466px at the smallest. */
-.dock { --t: 44px; }
-[data-dock=left] .dock, [data-dock=right] .dock { --t: clamp(30px, calc((100dvh - 58px) / var(--n, 1) - 4px), 44px); }
-[data-dock=bottom] .dock { --t: clamp(30px, calc((100vw - 58px) / var(--n, 1) - 4px), 44px); }
+.dock { --t: calc(44px * var(--fs)); }
+[data-dock=left] .dock, [data-dock=right] .dock { --t: clamp(30px, calc((100dvh - 58px) / var(--n, 1) - 4px), calc(44px * var(--fs))); }
+:is([data-dock=bottom], [data-dock=center]) .dock { --t: clamp(30px, calc((100vw - 58px) / var(--n, 1) - 4px), calc(44px * var(--fs))); }
 .dock .tile { width: var(--t); height: var(--t); border-radius: calc(var(--t) * .23); }
 .dock .tile .ico { width: calc(var(--t) * .64); height: calc(var(--t) * .64); }
-.tip { position: absolute; pointer-events: none; white-space: nowrap; font-size: var(--sm); line-height: 1.4; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--bg); opacity: 0; transform: scale(.97); transition: opacity 100ms ease-out, transform 100ms ease-out; }
-:root[data-mode=photo] .tip { color: #111113; }
-.tile:hover .tip { opacity: 1; transform: none; transition-duration: 125ms; transition-delay: 400ms; }
-.warm .tile:hover .tip { transition-duration: 0ms; transition-delay: 0ms; }
-[data-dock=bottom] .tip, [data-layout=strip] .tip { transform-origin: bottom center; }
+.tip { position: absolute; pointer-events: none; white-space: nowrap; font-size: var(--sm); line-height: 1.4; padding: 4px 8px; border-radius: 6px; background: #000; color: #fff; opacity: 0; }
+/* Tooltips show on the first frame of hover: no delay, no fade. */
+.tile:is(:hover, :focus-visible) > .tip { opacity: 1; }
+:is([data-dock=bottom], [data-dock=center]) .tip, [data-layout=strip] .tip { transform-origin: bottom center; }
 [data-dock=left]:not([data-layout=strip]) .tip { transform-origin: left center; }
 [data-dock=right]:not([data-layout=strip]) .tip { transform-origin: right center; }
-[data-dock=bottom] .tip, [data-layout=strip] .tip { bottom: calc(100% + 8px); }
+:is([data-dock=bottom], [data-dock=center]) .tip, [data-layout=strip] .tip { bottom: calc(100% + 8px); }
 [data-dock=left]:not([data-layout=strip]) .tip { left: calc(100% + 10px); }
 [data-dock=right]:not([data-layout=strip]) .tip { right: calc(100% + 10px); }
 
@@ -148,7 +147,7 @@ svg { width: 16px; height: 16px; flex: none; }
 .st .search .bar { display: none; }
 .st .search input { font-size: var(--sm); }
 .st .favs { display: flex; gap: 2px; }
-.st .tile { width: 40px; height: 40px; }
+.st .tile { width: calc(40px * var(--fs)); height: calc(40px * var(--fs)); }
 
 /* Photo credit */
 .credit { position: fixed; z-index: 5; left: var(--pad); bottom: 18px; color: var(--mute); }
@@ -164,7 +163,7 @@ svg { width: 16px; height: 16px; flex: none; }
 .chk { appearance: none; flex: none; width: 16px; height: 16px; margin: 0; border: 1px solid var(--faint); border-radius: 5px; display: grid; place-items: center; cursor: pointer; transition: background .15s, border-color .15s, transform 150ms ease-out; }
 .chk:active { transform: scale(.9); }
 .chk:checked { background: var(--ink); border-color: var(--ink); }
-.chk:checked::after { content: ""; width: 8px; height: 4px; border: solid var(--panel); border-width: 0 0 1.6px 1.6px; transform: translateY(-1px) rotate(-45deg); }
+.chk:checked::after { content: ""; width: 12px; height: 12px; background: var(--panel); -webkit-mask: var(--i-check) center / contain no-repeat; mask: var(--i-check) center / contain no-repeat; }
 .notes-f { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--mute); }
 
 /* Overlays */
@@ -490,8 +489,8 @@ svg { width: 16px; height: 16px; flex: none; }
 /* Two-row dock: a grid that fills row by row (bottom) or column by column (sides) */
 .dock.two { display: grid; grid-template-columns: repeat(var(--c), var(--t)); }
 [data-dock=left] .dock.two, [data-dock=right] .dock.two { grid-template-columns: none; grid-template-rows: repeat(var(--c), var(--t)); grid-auto-flow: column; }
-[data-dock=left] .dock.two, [data-dock=right] .dock.two { --t: clamp(30px, calc((100dvh - 58px) / var(--c, 1) - 4px), 44px); }
-[data-dock=bottom] .dock.two { --t: clamp(30px, calc((100vw - 58px) / var(--c, 1) - 4px), 44px); }
+[data-dock=left] .dock.two, [data-dock=right] .dock.two { --t: clamp(30px, calc((100dvh - 58px) / var(--c, 1) - 4px), calc(44px * var(--fs))); }
+:is([data-dock=bottom], [data-dock=center]) .dock.two { --t: clamp(30px, calc((100vw - 58px) / var(--c, 1) - 4px), calc(44px * var(--fs))); }
 /* Settings sidebar: one highlight that slides to the chosen section */
 .sbar { position: relative; }
 .nav-ind { position: absolute; left: 16px; right: 16px; top: 0; border-radius: 6px; pointer-events: none; transition: transform 240ms var(--ease), height 240ms var(--ease);
@@ -537,8 +536,8 @@ svg { width: 16px; height: 16px; flex: none; }
 
 /* v0.9.11 Clock fonts. One class sets family, weight and spacing; the large clock and the
    settings samples share it. Serif tracking tightened from -.02em: at 240px the gaps read loose. */
-.ff-serif { font-family: "Geist Serif", Geist, serif; font-weight: 400; letter-spacing: -.055em; }
-.ff-sans { font-family: Geist, sans-serif; font-weight: 200; letter-spacing: -.06em; }
+.ff-serif { font-family: "Geist Serif", Geist, serif; font-weight: 400; letter-spacing: -.035em; }
+.ff-sans { font-family: Geist, sans-serif; font-weight: 200; letter-spacing: -.03em; }
 .ff-pixel { font-family: "Geist Pixel Square", "Geist Mono", monospace; font-weight: 400; letter-spacing: -.02em; }
 .ff-dot { font-family: "Geist Pixel Circle", "Geist Mono", monospace; font-weight: 400; letter-spacing: -.02em; }
 .fcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -582,3 +581,132 @@ svg { width: 16px; height: 16px; flex: none; }
 :root[data-glass=solid] .ibtn:hover, :root[data-glass=solid] .ibtn.on { background: color-mix(in srgb, var(--panel) 88%, var(--ink)); }
 .note-line.warn { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0 4px; }
 .note-line.warn svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
+
+/* v0.9.12 Center dock: the dock joins the clock and search in one centered group, so the
+   group's padding is even top and bottom (the edge dock reserves 120px at the bottom). */
+[data-layout=dock][data-dock=center] .dk { padding-bottom: calc(var(--mast) + 24px); }
+[data-dock=center] .dock-zone { position: static; padding: 0; margin-top: 40px; }
+/* Favorite size (Settings › Favorites): one multiplier for dock, strip and editorial icons. */
+:root { --fs: 1; }
+:root[data-fsize=s] { --fs: .82; }
+:root[data-fsize=l] { --fs: 1.25; }
+.tile .ico { width: calc(28px * var(--fs)); height: calc(28px * var(--fs)); }
+.fav .ico { width: calc(26px * var(--fs)); height: calc(26px * var(--fs)); }
+.fav { height: calc(51px * max(1, var(--fs))); }
+
+/* v0.9.13 prototype: weather */
+.wx { margin-left: 12px; color: var(--ink); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.wx:empty { display: none; }
+.places { display: flex; flex-direction: column; margin-top: 8px; }
+.place { all: unset; cursor: pointer; padding: 8px 10px; border-radius: 8px; }
+.place:hover, .place:focus-visible { background: var(--fill); }
+.row.stack .sbox { margin-top: 10px; }
+.ibtn { position: relative; }
+/* GitHub's mark is a dark disc with the cat cut out: back it with a white disc, not a square */
+.ico.round.has { background: #fff !important; border-radius: 50%; }
+.ico.round.has img { inset: 6%; width: 88%; height: 88%; }
+/* v0.9.13 Search: smaller, with suggestions */
+.search { height: 44px; gap: 10px; }
+.search input { font-size: 1.0625rem; }
+.search > span[aria-hidden] svg { width: 16px; height: 16px; }
+.dk .search { width: min(480px, 80vw); margin-top: 36px; }
+.sugg { position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; right: 0; padding: 6px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); text-align: left; cursor: default; }
+:root[data-mode=photo] .sugg { background: #1c1c1f; --ink: #ededec; --mute: rgba(237,237,236,.65); }
+.sugg.up { top: auto; bottom: calc(100% + 6px); }
+.sugg[hidden] { display: none; }
+.opt { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 9px; border-radius: 7px; color: var(--ink); cursor: pointer; }
+.opt:hover, .opt[aria-selected=true] { background: var(--fill2); }
+.opt > svg { width: 14px; height: 14px; flex: none; margin: 0 2px; }
+.opt .ico { width: 18px; height: 18px; border-radius: 5px; font-size: 10px; }
+.sg-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sg-t .typed { color: var(--mute); }
+.sg-u { margin-left: auto; color: var(--mute); white-space: nowrap; }
+/* An open list sits above the dock and the credit */
+:is(.ed, .dk, .st):has(.sugg:not([hidden])) { z-index: 7; }
+/* Weather positions */
+.wx-clock { margin-top: 24px; font-size: 1.0625rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ed .wx-clock { margin-left: 8px; }
+.pill.wx-pill:empty, .wx-clock:empty { display: none; }
+/* Favorite icon picker */
+.pickable { position: relative; display: grid; border-radius: 8px; cursor: pointer; }
+.pickable input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.pickable:hover { outline: 1px dashed var(--mute); outline-offset: 2px; }
+.pickable:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.fhint { display: flex; gap: 12px; margin: 4px 8px 8px; color: var(--mute); }
+.fhint [hidden] { display: none; }
+/* Notes: toggles, headings, link chips */
+.notes { width: min(360px, calc(100vw - 32px)); box-sizing: border-box; }
+.note:not(:focus-within) .nmd { position: relative; z-index: 1; pointer-events: none; }
+.note:focus-within:not(:has(textarea:focus)) .nmd { display: block; position: relative; z-index: 1; pointer-events: none; }
+.note:focus-within:not(:has(textarea:focus)) textarea { position: absolute; inset: 0; height: 100%; opacity: 0; }
+.chip { pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; max-width: calc(100% - 28px); height: 22px; box-sizing: border-box; padding: 0 7px 0 4px; border-radius: 6px; background: var(--fill2); color: var(--ink); text-decoration: none; vertical-align: top; white-space: nowrap; }
+.chip:hover { background: var(--faint); }
+.chip .ico, .nlink .ico { width: 15px; height: 15px; border-radius: 4px; font-size: 9px; }
+.chip-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* An X profile on its own line */
+.chip.xcard { width: 100%; height: 52px; gap: 10px; padding: 0 12px 0 8px; margin: 4px 0; border-radius: 10px; }
+.xmark { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; background: #000; color: #fff; }
+.xmark svg { display: block; width: 16px; height: 16px; }
+.xcard .chip-t { display: grid; line-height: 17px; }
+.xcard .chip-t > * { overflow: hidden; text-overflow: ellipsis; }
+.xcard b { font-weight: 600; }
+.xcard .chip-t > span { color: var(--mute); }
+.note.head :is(.nmd, textarea) { font-size: 1rem; font-weight: 600; }
+.note.child { padding-left: 26px; }
+.twist { all: unset; flex: none; width: 16px; height: 22px; display: grid; place-items: center; color: var(--mute); cursor: pointer; }
+.twist svg { width: 14px; height: 14px; transition: transform 150ms var(--ease); }
+.twist[aria-expanded=true] svg { transform: rotate(90deg); }
+.twist:focus-visible, .ntab:focus-visible, .tempty:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-radius: 4px; }
+.kids { color: var(--mute); font-variant-numeric: tabular-nums; }
+.tempty { all: unset; display: block; padding: 3px 0 3px 26px; line-height: 22px; color: var(--mute); cursor: pointer; }
+.ntabs { display: flex; gap: 14px; }
+.ntab { all: unset; cursor: pointer; color: var(--mute); }
+.ntab[aria-pressed=true] { color: var(--ink); }
+.nlink { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 6px; margin: 0 -6px; border-radius: 6px; color: var(--ink); text-decoration: none; }
+.nlink:hover { background: var(--fill); }
+.nempty { color: var(--mute); margin: 8px 0; }
+@media (prefers-reduced-motion: reduce) { .twist svg { transition: none; } }
+
+/* v0.9.14 */
+:root { --i-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); --i-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E"); }
+/* Tooltips: small, white on black, in every theme */
+.tip, #tip { font-size: .6875rem; line-height: 16px; padding: 3px 7px; border-radius: 5px; background: #000; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+#tip { position: fixed; z-index: 100; max-width: 280px; overflow-wrap: anywhere; pointer-events: none; }
+#tip[hidden] { display: none; }
+/* Marks are centered by layout, not by a font's baseline */
+.cell .x svg { display: block; width: 14px; height: 14px; stroke-width: 2.25; }
+.swc .x svg { display: block; width: 12px; height: 12px; stroke-width: 2.25; }
+.ph .ok svg { display: block; width: 12px; height: 12px; stroke-width: 3; }
+.ph.empty svg { display: block; width: 18px; height: 18px; }
+.toast .x-toast { display: grid; place-items: center; }
+.x-toast svg, .frow .grip svg, .acts .link svg { display: block; width: 14px; height: 14px; }
+.frow .grip { display: flex; }
+.frow .acts { align-items: center; }
+.acts .link:has(svg) { display: grid; place-items: center; }
+.with-mark { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.with-mark svg, .tile.more .n svg { display: block; width: 14px; height: 14px; }
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; width: 14px; height: 14px; margin-left: 8px; background: var(--mute); -webkit-mask: var(--i-x) center / contain no-repeat; cursor: pointer; }
+/* Search: smaller, with bangs, past searches and suggestions */
+.search { height: 40px; }
+.search input { font-size: .9375rem; }
+.search > span[aria-hidden] svg { width: 15px; height: 15px; }
+.dk .search { width: min(420px, 80vw); margin-top: 32px; }
+.bang { all: unset; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 24px; box-sizing: border-box; padding: 0 8px 0 5px; border-radius: 6px; background: var(--fill2); color: var(--ink); cursor: pointer; }
+.bang[hidden] { display: none; }
+.bang .ico, .st .bang .ico { width: 15px; height: 15px; border-radius: 4px; font-size: 9px; }
+.bang:focus-visible { outline: 2px solid var(--ink); }
+.forget { display: grid; place-items: center; width: 22px; height: 22px; margin-left: auto; flex: none; border-radius: 5px; color: var(--mute); opacity: 0; }
+.opt:is(:hover, [aria-selected=true]) .forget { opacity: 1; }
+.forget:hover { color: var(--ink); }
+.forget svg { display: block; width: 13px; height: 13px; }
+.sg-ask { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 9px; color: var(--ink); }
+.sg-ask[hidden] { display: none; }
+.sg-ask p { flex-basis: 100%; margin: 0; color: var(--mute); }
+.sg-ask .link:not(.mute) { font-weight: 600; }
+[role=listbox]:not(:empty) + .sg-ask { margin-top: 4px; box-shadow: inset 0 1px var(--line); }
+.ctl-pair { display: inline-flex; align-items: center; gap: 14px; }
+.bangs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 12px; margin-top: 12px; color: var(--mute); }
+.bangs code { display: inline-block; min-width: 54px; color: var(--ink); }
+.link.ul { text-decoration: underline; text-underline-offset: 2px; }
+/* Notes footer: the same space above the text as the panel leaves below it */
+.notes-f { padding-top: 14px; }

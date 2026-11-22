@@ -1,20 +1,53 @@
 # Lumen privacy policy
 
-Last updated: 15 November 2026
+Last updated: 22 November 2026
 
-Lumen is a new-tab page for Chrome. It has no accounts, no analytics and no ads.
+Lumen is a new-tab page for Chrome. It has no accounts, no analytics and no ads. Its developer doesn't collect or sell your data. Some features need other services to work, and this page lists each one and what it receives.
 
-## What stays on your computer
-Your favorites, notes, settings and uploaded photos are stored only in your browser on this computer. Lumen never sends them anywhere. Uninstalling Lumen deletes them.
+## What is stored on your computer
+Your favorites and any icons you upload for them, notes, settings, weather place and last reading, uploaded photos, and your last 30 searches (if "Remember searches" is on) are stored in this browser. They don't sync. Lumen never uploads your notes, your photos or those icons. The one part of a note that is used online is the site name of a link in it, to get that site's icon (see "Site icons"). Uninstalling Lumen deletes all of it. You can erase past searches in Settings > Search.
 
 ## What leaves your computer
-- **Unsplash photo search.** When you search for a wallpaper, the search words are sent to Lumen's server (`lumen-api-delta.vercel.app`), which passes them to Unsplash and returns the results. When you pick a photo, Unsplash is told that the photo was used, as their rules require. Lumen's server does not store your searches or link them to you.
-- **Wallhaven wallpaper search.** Search words for Wallhaven also go through Lumen's server, which passes them to Wallhaven (`wallhaven.cc`) and returns the results. Only safe-for-work wallpapers are requested. Nothing is stored or linked to you.
-- **Photos you pick from Unsplash or Wallhaven** load directly from their servers, like any image on the web.
 
-Lumen's server keeps a copy of popular search results for up to an hour, so the same search doesn't hit Unsplash or Wallhaven again. Those copies contain only the public results, never anything about who searched.
+### Searching
+- **A normal search** is handed to Chrome, which sends it to the default search engine you chose in Chrome.
+- **A bang**, like `!yt lofi`, sends those words to the site you named (here, YouTube) and to no search engine.
 
-Unsplash's and Wallhaven's own privacy policies apply to those requests: https://unsplash.com/privacy and https://wallhaven.cc/privacy-policy
+### Suggestions as you type (off until you turn it on)
+If you turn this on, Chrome asks you to allow access to `duckduckgo.com`. After that, what you type in Lumen's search bar is sent to DuckDuckGo as you type, without cookies, to get suggestions. Text that uses a bang, or contains `@` or `://`, is not sent once it does. The characters typed before that point may already have been sent. Turning the setting off stops this and removes the access.
+
+### Site icons
+To show icons for your favorites (including the ones Lumen starts with), the bangs you browse and the links in your notes (including the starter ones), Lumen loads images from:
+- **Google's icon service** (`google.com` and `gstatic.com`), which receives the site's name, like `youtube.com`, but never the page's full address.
+- **Google's and GitHub's image servers** (`gstatic.com` and `githubassets.com`), for their own apps' icons.
+
+Like any image request, these include your IP address and browser details, and may include cookies those companies have set. Local and private addresses, like `localhost`, are never sent.
+
+### Weather (off until you turn it on)
+The town you search for is sent to Open-Meteo. After you pick a place, its coordinates, rounded to about 1 km, are sent to Open-Meteo when you open a tab, at most every 30 minutes after a successful update. Lumen never reads your device's location.
+
+### Wallpapers
+- **Photo search.** Words you type in the Unsplash or Wallhaven search, including partly typed ones after a short pause, go to Lumen's server (`lumen-api-delta.vercel.app`), which passes them to Unsplash or Wallhaven. Opening either tab also runs a search.
+- **Picking an Unsplash photo** tells Unsplash, through the same server, that the photo was used, as Unsplash requires.
+- **Thumbnails and wallpapers** load directly from Unsplash and Wallhaven, which see your IP address like any website.
+
+Lumen's server has no database and its code logs nothing. It is hosted by Vercel, which processes your IP address and may keep short-lived request logs that include search words. Search results are cached for up to an hour.
+
+## How the data is used
+Only to provide the feature it belongs to. It is never sold, used for advertising or creditworthiness, or given to anyone other than the services above.
+
+Lumen's use of information complies with the [Chrome Web Store User Data Policy](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq), including the Limited Use requirements.
+
+## The other services' policies
+- Google: https://policies.google.com/privacy
+- GitHub: https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
+- DuckDuckGo: https://duckduckgo.com/privacy
+- Open-Meteo: https://open-meteo.com/en/terms
+- Unsplash: https://unsplash.com/privacy
+- Wallhaven: https://wallhaven.cc/privacy-policy
+- Vercel: https://vercel.com/legal/privacy-policy
+
+Any other site you open or search with a bang has its own policy.
 
 ## Contact
 Questions: open an issue at https://github.com/dedkul/homepage-bookmarker/issues

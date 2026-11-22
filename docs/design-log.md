@@ -325,3 +325,31 @@ Source: section "Edited Layouts" (119:7) on page 81:2. I diffed each edited fram
 - **Fewer requests:** the proxy marks successful searches `s-maxage=3600`, so Vercel's edge serves repeats (the preset chips especially) without touching either API. In the extension, each search is remembered for the session, so going back to an earlier word is instant, and a search already in flight is shared instead of sent twice. A newer search always wins over a slower older one.
 - **Copy:** the limit message no longer says "50 times an hour". It now reads "Unsplash search is busy right now", because the allowance is shared. Wallhaven gets its own "busy" state with Try again. Only a 429 counts as busy; before, a response that used the last request was thrown away even though it had results.
 - Unsplash's API guidelines don't forbid caching search results (they require hotlinked image URLs, which we keep, and warn against too many requests too quickly).
+
+## v0.9.13 · Suggestions, instant tooltips, app icons, notes as links (2026-11-22)
+Prototype only, except tooltips and app icons, which are in the extension too.
+- **Tooltips have no delay and no fade.** *Why:* 400 ms read as lag.
+- **Known-app icons** (Gmail and other Google apps, GitHub) load from the brands' own CDNs, and any favorite can use an uploaded image (128 px, stored locally). *Why:* Google's favicon service returns a plain G for Google apps and puts GitHub on a white square.
+- **Search is smaller and suggests.** Favorites and saved links match first, then the chosen engine (Google, DuckDuckGo, Bing). Kagi and Perplexity send nothing. The prototype uses serve.py `/api/suggest`; the extension will need host permissions for those endpoints.
+- **Weather has its own Settings section** with three positions: by date, under clock, top right.
+- **Notes:** `>` toggle (one level), `#` heading, pasted links become chips, and a Links tab lists them. No folders: toggles do that job, so it doesn't become a bookmark manager.
+- **Open before submitting:** the Web Store requires `chrome.search` for search boxes on new-tab pages, so the engine picker has to go. PRIVACY.md also needs updating: favicon requests send favorite domains to Google, and suggestions, weather and note-link icons add more requests.
+
+## v0.9.14 · Default engine, bangs, privacy, icon fixes (2026-11-22)
+In the prototype and the extension.
+- **Engine picker removed; searches use `chrome.search`.** *Why:* simpler, and compliant. Correction to v0.9.13: the Web Store does allow a picker if it defaults to the browser's engine; what it forbids is overriding that default.
+- **Bangs** search one site (`!yt lofi`). *Why:* the policy allows vertical search. No bangs for general web engines, for the same reason.
+- **Suggestions are opt-in and come from DuckDuckGo**, through an optional host permission. Past searches are local (30, erasable). *Why:* sending keystrokes needs disclosure and consent in the product, and DuckDuckGo's endpoint sets no cookies.
+- **Wallpaper of the day removed.** *Why:* not liked, and the switch looked lost in its card.
+- **Weather and notes (toggles, headings, link chips, Links tab) shipped to the extension.** Collections and custom icon upload stay in the prototype until approved.
+- **Every mark is a Lucide SVG.** *Why:* text glyphs like × sit on the font's baseline, so they can't be centered reliably.
+- **Tooltips:** 11 px, white on black. None on Notes or Settings. In Editorial only when a name is cut off.
+- **Notes footer:** 14 px above and below its text.
+- **PRIVACY.md rewritten** from the requests the code makes, and checked against a network capture.
+
+## v0.9.15 · Starter notes, custom icons (2026-11-22)
+- **Starter notes replace the development to-dos:** two first steps, a "Design files" toggle and a card to follow the maker on X. Existing users keep their notes. *Supersedes* "the follow link never appears on the new tab" (v0.9.5): it is now also in the starter notes, which open closed and can be deleted.
+- **An X profile link alone on a line shows as a card**, drawn locally. *Why:* a real profile card would need X's API or a request to X on every render.
+- **Custom icon upload shipped to the extension.** Collections stay in the prototype until there are wallpapers to put in them.
+- **Editing a favorite keeps its whole address.** The field used to show only the domain, so saving lost the path.
+- **Geist and Lucide licence notices ship in the extension**, as both licences require.

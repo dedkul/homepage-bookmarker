@@ -19,8 +19,8 @@ export async function GET(request) {
   const cors = { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' };
 
   const q = (new URL(request.url).searchParams.get('q') || 'landscape').slice(0, 100);
-  // Fixed filters, as in the prototype's serve.py: general category, safe for work, at least 1920x1080.
-  const params = new URLSearchParams({ q, categories: '100', purity: '100', atleast: '1920x1080', sorting: 'relevance' });
+  // Fixed filters, as in the prototype's serve.py: general and anime categories (no people), safe for work, at least 1920x1080.
+  const params = new URLSearchParams({ q, categories: '110', purity: '100', atleast: '1920x1080', sorting: 'relevance' });
   const r = await fetch(`${API}?${params}`, { headers: { 'User-Agent': 'Lumen' } }).catch(() => null);
   if (!r) return new Response('Wallhaven unreachable', { status: 502, headers: cors });
   return new Response(await r.text(), {
