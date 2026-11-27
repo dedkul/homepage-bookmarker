@@ -1,0 +1,2 @@
+# Paste one wallpaper link per line: a Wallhaven page (wallhaven.cc/w/...) or an Unsplash photo page (unsplash.com/photos/...).
+# Lines starting with # are ignored.

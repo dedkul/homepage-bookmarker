@@ -82,3 +82,10 @@ Justification (if asked): All JavaScript is in the package. The extension only f
 
 ## Test instructions (for reviewers)
 No account or login is needed. Open a new tab after installing. To see search suggestions, open Settings (gear, top right) > Search and turn on suggestions; Chrome will ask to allow duckduckgo.com. Weather is in Settings > Weather.
+
+## Publishing an update
+1. Raise `version` in `extension/manifest.json` (0.1.0 → 0.1.1 for fixes, 0.2.0 for features). The Store rejects a package whose version isn't higher than the live one.
+2. Run `sh store/build-zip.sh`.
+3. Dashboard → Lumen → **Package** → **Upload new package**, then **Submit for review**. Edit the listing, screenshots or privacy answers in the same submission if anything changed.
+4. The live version stays up during review. After approval Chrome updates users automatically, usually within a few hours.
+5. A new permission makes Chrome disable Lumen for existing users until they accept it, so avoid adding permissions casually.

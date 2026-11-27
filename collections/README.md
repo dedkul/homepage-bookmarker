@@ -4,24 +4,31 @@ Wallpaper sets for Lumen's Collections tab. Each folder here is one collection.
 
 ```
 collections/
-  windows-7/
-    collection.json     name and credits (optional)
-    01.jpg
-    02.webp
-    live-01.mp4         live wallpaper
   anime/
-    ...
+    links.txt
+  windows-7/
+    links.txt
 ```
 
-- **Folder names:** lowercase with dashes, like `windows-7`. The folder name becomes the collection's id.
+## How to add wallpapers
+
+Paste the wallpaper's **page link** into `links.txt`, one per line:
+
+```
+https://wallhaven.cc/w/abc123
+https://unsplash.com/photos/some-photo-id
+```
+
+Lumen loads these the same way it already loads search results: the image comes from Wallhaven or Unsplash, with a credit linking back. Nothing is copied into this repo or the extension.
+
+## Why links and not image files
+
+This repo is public and the extension is published, so any image file here is being redistributed. Most wallpapers belong to someone: anime art to its artist or studio, Windows wallpapers to Microsoft and the photographers it licensed them from. Redistributing them without permission can get the extension taken down after a copyright complaint.
+
+Linking to where the artist or uploader already shared the wallpaper, with credit, is what Lumen already does in search and is much lower risk.
+
+**Image files are fine only when you're allowed to share them:** your own work, art you have written permission for, or images under a licence that allows it (CC0, or CC BY with credit). If you add one, put a `credits.txt` beside it with the source and licence.
+
 - **Photos:** JPG or WebP, at least 2560 × 1440.
-- **Live wallpapers:** MP4 or WebM, short loops without sound. GitHub rejects files over 100 MB, so keep each one well under that.
-- **`collection.json` (optional):**
-
-  ```json
-  { "name": "Windows 7", "credit": "Microsoft", "source": "https://example.com/where-you-found-them" }
-  ```
-
-**Only add wallpapers you're allowed to share.** This repo is public, so everything here can be downloaded by anyone. Note the source and licence in `collection.json` when you know them.
-
-Nothing in this folder ships with the extension yet. Once a few collections exist, we'll decide how Lumen loads them, either bundled in the extension or served from the proxy.
+- **Live wallpapers (later):** MP4 or WebM, short loops without sound, well under 100 MB (GitHub's limit).
+- **Folder names:** lowercase with dashes, like `windows-7`.
