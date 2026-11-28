@@ -18,6 +18,7 @@
   d.style.setProperty('--solid', color);
   d.dataset.glass = bg.glass === false ? 'solid' : (bg.glass == null || bg.glass === true) ? 'frost' : bg.glass;
   d.dataset.surface = bg.surface || 'black';
+  if (s.lite) d.dataset.lite = '';
   d.style.setProperty('--frost', bg.frost == null ? 0.5 : bg.frost);
   // Text tone: dark text on light colors, light text otherwise (same rule as toneOf in lumen.js).
   var tone = 'dark';

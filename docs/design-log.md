@@ -359,3 +359,12 @@ In the prototype and the extension.
 - **Photographer names on Unsplash search results are links** to their profiles, shown on hover. *Why:* Unsplash's guidelines ask that every shown photo links to its photographer. The link sits beside the thumbnail button, not inside it, so clicking the photo still picks it.
 - **`collections/` added** for the wallpaper sets to come, with the folder layout in its README. Nothing in it ships yet.
 - **Store listing, privacy answers and five 1280 × 800 screenshots** are in `store/`.
+
+## v0.10 · Today, Focus, grouped settings (2026-11-28) · extension 0.2.0
+Asked for: Momentum Plus's focus features (Pomodoro, count up, sounds, focus stats, main focus, mantras, quotes, low-performance mode) in Lumen, plus a clearer settings window.
+- **Today** (settings section): main focus under the clock (clears at midnight), a daily mantra under it, an optional daily quote centered in the top bar, a countdown pill. Each line has "show another"; users can add their own mantras and quotes. Mantras are Lumen's own; quotes are from public-domain writers only.
+- **Focus**: a timer button in the top bar (F) opens a small panel: Pomodoro or count up, Start/Pause, Reset/Finish, Skip, a sound, and seven days of focus minutes. While a timer runs it takes over the big clock and the button becomes a pill with the time; the tab title shows it too. One timer is shared by all tabs (localStorage, Web Locks so a finished round is applied once).
+- **Sounds** are generated with Web Audio (rain, ocean, brown, pink, white noise): no files, no licences, no network. In the extension they play in an offscreen document so they survive leaving the new tab; an alarm finishes a round when no Lumen tab is open. New permissions `alarms` and `offscreen` carry no install warning.
+- **General**: Reduce visual effects (no blur, glass, fades or animation), applied by the boot script before first paint; keyboard shortcuts listed.
+- **Settings sidebar** grouped: Appearance (Layout, Background), Home page (Today, Favorites, Search, Weather), Productivity (Focus, Notes), General.
+- Left out on purpose: site blocker (needs host access to every site), calendar and task-app integrations (accounts and OAuth), AI. They conflict with "your data stays yours" and would need broad permissions.

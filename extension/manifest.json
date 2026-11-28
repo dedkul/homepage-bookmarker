@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lumen",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A calm, fast new tab with your favorite sites, a clock, notes and your own wallpapers.",
   "icons": {
     "16": "icons/icon16.png",
@@ -12,11 +12,16 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "permissions": [
-    "search"
+    "search",
+    "alarms",
+    "offscreen"
   ],
   "optional_host_permissions": [
     "https://duckduckgo.com/*"

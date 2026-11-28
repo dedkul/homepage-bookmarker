@@ -29,8 +29,11 @@ Quick notes, to-dos and links in a panel that stays out of the way. Paste a link
 WALLPAPERS
 Pick photos from Unsplash or Wallhaven, upload your own, or use a plain color. Lumen rotates through up to 10.
 
+FOCUS
+A Pomodoro or count-up timer that can take over the big clock, with a soft chime, rain, ocean and noise sounds that keep playing after you leave the tab, and a week of focus minutes. Set one main focus for the day, and get a short mantra and a quote each day, or write your own.
+
 ALSO
-Weather for a town you choose, a second time zone, 12 or 24-hour time, light and dark.
+Weather for a town you choose, a countdown to a date, a second time zone, 12 or 24-hour time, light and dark, and a reduced-effects mode for slower computers.
 
 YOUR DATA
 No account, no analytics, no ads. Favorites, notes, photos and settings stay in this browser and are deleted when you remove Lumen.
@@ -57,6 +60,12 @@ Lumen replaces Chrome's new tab page with a page that shows the time, the user's
 
 **Permission justification, `search`:**
 Lumen's search bar sends what the user types to the default search engine they chose in Chrome, using chrome.search.query, so Lumen never picks or changes the search engine.
+
+**Permission justification, `alarms`:**
+Lumen's focus timer (Pomodoro) uses one alarm to finish a focus round or break, and play its chime, when no new tab is open. The alarm is cleared when the timer is paused or reset.
+
+**Permission justification, `offscreen`:**
+Plays the focus sounds the user picks (rain, ocean, noise, generated in the browser) and the timer's chime in an offscreen document, so they keep playing after the user leaves the new tab. Reason: AUDIO_PLAYBACK. Nothing is downloaded or sent.
 
 **Permission justification, host `https://duckduckgo.com/*` (optional):**
 Requested only when the user turns on "suggestions as you type" in Settings > Search. Lumen then fetches search suggestions for what they type from DuckDuckGo's autocomplete endpoint. Turning the setting off removes the permission. It is not requested at install.
