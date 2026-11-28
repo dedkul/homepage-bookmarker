@@ -12,14 +12,24 @@ collections/
 
 ## How to add wallpapers
 
-Paste the wallpaper's **page link** into `links.txt`, one per line:
+Paste the wallpaper's **page link** into `links.txt`, one per line. Lines starting with `#` are notes and are skipped.
 
 ```
+# Your Name
 https://wallhaven.cc/w/abc123
+https://whvn.cc/abc123
 https://unsplash.com/photos/some-photo-id
 ```
 
-Lumen loads these the same way it already loads search results: the image comes from Wallhaven or Unsplash, with a credit linking back. Nothing is copied into this repo or the extension.
+Commit to `master` (editing the file on github.com is fine). That's all: no Store update, no Vercel step.
+
+- Lumen's server reads these files from GitHub and caches them for up to an hour.
+- Each copy of Lumen checks for changes at most every 12 hours, so a new wallpaper reaches everyone within about half a day.
+- The folder name becomes the collection's title (`windows-7` shows as "Windows 7"). A folder with no working links is hidden.
+- Removing a line removes the wallpaper from the tab. People who already added it to their own set keep it.
+- Wallhaven wallpapers that aren't marked safe for work are skipped. Up to 60 links per collection are used.
+
+To preview before committing, run the prototype (`cd prototypes && python3 serve.py`). It reads your local files directly.
 
 ## Why links and not image files
 

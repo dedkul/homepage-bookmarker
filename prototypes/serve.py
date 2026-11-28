@@ -6,7 +6,9 @@ prototyping. Run from this folder:  python3 serve.py   (serves http://localhost:
 """
 import json
 import os
+import re
 import ssl
+import subprocess
 import urllib.parse
 import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -26,6 +28,8 @@ class Handler(SimpleHTTPRequestHandler):
         url = urllib.parse.urlparse(self.path)
         if url.path == "/api/suggest":
             return self.suggest(url)
+        if url.path == "/api/collections":
+            return self.collections()
         if url.path != "/api/wallhaven":
             return super().do_GET()
         q = urllib.parse.parse_qs(url.query).get("q", [""])[0][:100]
@@ -53,6 +57,26 @@ class Handler(SimpleHTTPRequestHandler):
             with urllib.request.urlopen(req, timeout=4, context=CTX) as r:
                 data = json.loads(r.read().decode(r.headers.get_content_charset() or "utf-8"))
             body, code = json.dumps(data[:2]).encode(), 200
+        except Exception as e:
+            body, code = json.dumps({"error": str(e)}).encode(), 502
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def collections(self):
+        # Same code as the live proxy, run on this checkout's collections/ folder (see collections-local.mjs).
+        env = dict(os.environ)
+        try:
+            m = re.search(r'LUMEN_UNSPLASH_KEY\s*=\s*["\']([^"\']+)', open("config.local.js").read())
+            if m:
+                env["LUMEN_UNSPLASH_KEY"] = m.group(1)
+        except OSError:
+            pass
+        try:
+            out = subprocess.run(["node", "collections-local.mjs"], capture_output=True, timeout=120, env=env, check=True)
+            body, code = out.stdout, 200
         except Exception as e:
             body, code = json.dumps({"error": str(e)}).encode(), 502
         self.send_response(code)
