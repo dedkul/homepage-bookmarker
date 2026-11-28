@@ -19,7 +19,11 @@ const DEF = {
   ].map(([name, url]) => ({ name, url })),
   favSize: 'm', // s / m / l: favorite icon size in every layout
   search: { show: true, online: null, remember: true, newTab: false, focus: false }, // online: null until asked
-  weather: { show: false, place: null, unit: 'c', pos: 'date' }, // place: { name, lat, lon } from Open-Meteo geocoding
+  weather: { show: false, place: null, unit: 'c', pos: 'date' },
+  // v0.10: things for the day under the clock and in the top bar. Custom lines are one per line.
+  today: { focus: true, mantra: true, quote: false, mine: false, myMantras: '', myQuotes: '', count: false, countName: '', countDate: '' },
+  focus: { show: true, ...FOCUS_DEF },
+  lite: false, // reduce visual effects // place: { name, lat, lon } from Open-Meteo geocoding
   notes: { show: true, open: false, done: 'bottom', items: [
     // What a new user sees. Every line states k, or the v0.9.8 migration below would make it a task.
     { t: 'Add your first note here', d: false, k: true },
@@ -135,6 +139,9 @@ const NAV_ICON = {
   Weather: lucide('<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>'),
   Search: lucide('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
   Notes: lucide('<path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/><rect width="16" height="18" x="4" y="4" rx="2"/><path d="M8 10h6"/><path d="M8 14h8"/><path d="M8 18h5"/>'),
+  Today: lucide('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
+  Focus: lucide('<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>'),
+  General: lucide('<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'),
 };
 const MARK = {
   x: lucide('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
@@ -146,6 +153,8 @@ const MARK = {
   grip: lucide('<circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>'),
   more: lucide('<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>'),
   clock: lucide('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+  next: lucide('<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>'),
+  timer: lucide('<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>'),
 };
 const ENTER_ICON = lucide('<polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>');
 
@@ -257,27 +266,29 @@ function mast() {
   // Small clock: the time moves up next to the date and the big clock goes away.
   const small = s.clock.show === 'small' && s.layout !== 'strip';
   return `<header class="mast"><div class="date">${small ? '<span class="mtime"><span data-clock></span> <span data-ampm></span></span>' : ''}<span data-date></span>${wxSlot() === 'date' ? '<span class="wx" data-wx></span>' : ''}</div><div class="mast-r">
-    ${wxSlot() === 'right' ? '<span class="pill wx-pill" data-wx></span>' : ''}
+    ${countView()}${wxSlot() === 'right' ? '<span class="pill wx-pill" data-wx></span>' : ''}
     ${s.clock.zone2 ? `<div class="pill"><i class="dot" data-dot aria-hidden="true"></i><span>${esc(CITIES.find((c) => c[1] === s.clock.tz)?.[0] || s.clock.tz)}</span><span data-z2></span><span class="mute" data-diff></span></div>` : ''}
-    ${s.notes.show ? `<button class="ibtn${s.notes.open ? ' on' : ''}" data-act="notes" aria-expanded="${s.notes.open}" aria-label="Notes">${ICON.notes}</button>` : ''}
-    <button class="ibtn" data-act="settings" aria-label="Settings" aria-keyshortcuts=",">${ICON.sliders}</button></div></header>`;
+    ${focusBtn()}${s.notes.show ? `<button class="ibtn${s.notes.open ? ' on' : ''}" data-act="notes" aria-expanded="${s.notes.open}" aria-label="Notes">${ICON.notes}</button>` : ''}
+    <button class="ibtn" data-act="settings" aria-label="Settings" aria-keyshortcuts=",">${ICON.sliders}</button></div>${quoteView()}</header>`;
 }
 const wxUnder = () => (wxSlot() === 'clock' ? '<div class="wx-clock" data-wx></div>' : '');
-const bigClock = () => (s.clock.show === 'large' ? `<div class="time ff-${s.clock.font}"><span data-clock></span><span class="ampm" data-ampm></span></div>${wxUnder()}` : '');
+const bigClock = () => (s.clock.show !== 'large' ? ''
+  : timerInClock() ? `<div class="time ff-${s.clock.font} ftimer"><span data-ft></span><span class="ampm" data-fphase></span></div>${wxUnder()}`
+  : `<div class="time ff-${s.clock.font}"><span data-clock></span><span class="ampm" data-ampm></span></div>${wxUnder()}`);
 function mainView() {
   if (s.layout === 'dock') {
     const two = s.dock.rows === 2 && s.favs.length >= 4, n = Math.max(1, s.favs.length);
     const dock = `<div class="dock-zone"><nav class="dock${two ? ' two' : ''}" aria-label="Favorites" style="--n:${n};--c:${Math.ceil(n / (two ? 2 : 1))}">${s.favs.map(tile).join('')}${addTile()}${gapTile()}</nav></div>`;
     // Center: the dock joins the clock and search as one group, centered on the page.
-    if (s.dock.pos === 'center') return `<main class="dk">${bigClock()}${searchForm()}${dock}</main>`;
-    return `<main class="dk">${bigClock()}${searchForm()}</main>
+    if (s.dock.pos === 'center') return `<main class="dk">${bigClock()}${todayView()}${searchForm()}${dock}</main>`;
+    return `<main class="dk">${bigClock()}${todayView()}${searchForm()}</main>
       <div class="dock-zone"><nav class="dock${s.dock.rows === 2 && s.favs.length >= 4 ? ' two' : ''}" aria-label="Favorites" style="--n:${Math.max(1, s.favs.length)};--c:${Math.ceil(Math.max(1, s.favs.length) / (s.dock.rows === 2 && s.favs.length >= 4 ? 2 : 1))}">${s.favs.map(tile).join('')}${addTile()}${gapTile()}</nav></div>`;
   }
   if (s.layout === 'strip') {
-    return `<main class="st"><div class="sclock">${s.clock.show === 'off' ? '' : '<span class="stime"><span data-clock></span><span class="ampm" data-ampm></span></span>'}<span class="mute"><span data-date></span>${wxSlot() === 'clock' ? '<span class="wx" data-wx></span>' : ''}</span></div>
+    return `${todayView('st-today')}<main class="st"><div class="sclock">${s.clock.show === 'off' ? '' : '<span class="stime"><span data-clock></span><span class="ampm" data-ampm></span></span>'}<span class="mute"><span data-date></span>${wxSlot() === 'clock' ? '<span class="wx" data-wx></span>' : ''}</span></div>
       ${searchForm() || '<div style="flex:1"></div>'}<nav class="favs" aria-label="Favorites">${s.favs.map(tile).join('')}${addTile()}${s.favs.length ? '<button class="tile more" data-act="more" aria-expanded="false" aria-label="More favorites" hidden><span class="n"></span></button><div class="more-pop" hidden></div>' : ''}</nav></main>`;
   }
-  return `<main class="ed"><section class="hero">${bigClock()}</section>
+  return `<main class="ed"><section class="hero">${bigClock()}${todayView()}</section>
     <section class="side">${searchForm()}
       <div class="fgrid">${s.favs.map((f, i) => `<div class="fav"><a href="${esc(f.url)}"${target()} data-i="${i}" data-tip="${esc(f.name)}">${icon(f)}<span>${esc(f.name)}</span></a><button class="edit" data-act="edit" data-i="${i}" aria-label="Edit ${esc(f.name)}">Edit</button></div>`).join('')}${s.favs.length < MAX_FAVS ? `<div class="fav ghost${s.favs.length % 2 ? '' : ' below'}${s.favs.length ? '' : ' show'}"><button data-act="add" aria-label="Add a favorite">${addMark()}<span>Add</span></button></div>` : ''}</div>
     </section></main>`;
@@ -396,11 +407,15 @@ function render() {
   // A centered dock sits in the page, not on an edge, so there is nothing to tuck it into.
   html.toggleAttribute('data-autohide', !!s.dock.autohide && s.dock.pos !== 'center');
   closeSugg(); setBang(null); hideTip();
-  $('#app').innerHTML = mast() + mainView() + notesView() + creditView();
+  html.toggleAttribute('data-lite', !!s.lite);
+  $('#app').innerHTML = mast() + mainView() + notesView() + focusPanel() + creditView();
+  ui.fActive = tActive(tGet());
   fitStrip();
   tick();
   paintWeather();
   liquify();
+  if (ui.focusOpen) placeSegs();
+  focusTick();
 }
 
 /* ---------- Background ---------- */
@@ -435,7 +450,7 @@ async function setPhoto(src) {
    the surface's size and corner radius, so maps are built per size and reused (Chromium only; other
    browsers keep the CSS fallback blur). No library, no images: a few KB of generated data. */
 const LG = { svg: null, ids: new Map(), ro: new ResizeObserver((es) => es.forEach((e) => lens(e.target))) };
-const LG_SEL = '.dock, .st, .notes, .pill, .ibtn, .more-pop';
+const LG_SEL = '.dock, .st, .notes, .fpanel, .pill, .ibtn, .more-pop';
 function lensMap(w, h, r) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const ctx = c.getContext('2d'), img = ctx.createImageData(w, h), px = img.data, bez = Math.min(16, Math.min(w, h) / 4); // narrow rim, clear middle
@@ -466,7 +481,7 @@ function lens(el) {
 }
 function liquify() {
   LG.ro.disconnect(); // render() replaces the surfaces, so start from the current ones
-  if (html.dataset.glass !== 'liquid') { $$('[data-lg]').forEach((el) => { el.style.backdropFilter = el.style.webkitBackdropFilter = ''; delete el.dataset.lg; }); return; }
+  if (html.dataset.glass !== 'liquid' || s.lite) { $$('[data-lg]').forEach((el) => { el.style.backdropFilter = el.style.webkitBackdropFilter = ''; delete el.dataset.lg; }); return; }
   $$(LG_SEL).forEach((el) => { LG.ro.observe(el); lens(el); });
 }
 async function applyBg() {
@@ -646,13 +661,127 @@ function fillCollections() {
     .catch(() => { if ($('#cgrid')) $('#cgrid').innerHTML = '<div class="err"><span class="desc">Unable to load collections. Check your connection and try again.</span></div>'; });
 }
 
+/* ---------- Today: main focus, mantra, quote, countdown ----------
+   Today's focus and the "show another" offsets live in their own keys and reset at midnight. */
+const TODAY_KEY = 'lumen.today', SKIP_KEY = 'lumen.skip';
+const dayNo = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
+const mainFocus = () => { const m = store.get(TODAY_KEY); return m && m.day === dayKey() ? m : null; };
+const skips = () => { const k = store.get(SKIP_KEY); return k && k.day === dayKey() ? k : { day: dayKey(), m: 0, q: 0 }; };
+const lines = (txt) => (txt || '').split('\n').map((l) => l.trim()).filter(Boolean);
+const pickOf = (pool, off) => (pool.length ? pool[(dayNo() + off) % pool.length] : null);
+function todayMantra() {
+  const mine = lines(s.today.myMantras);
+  return pickOf(s.today.mine && mine.length ? mine : [...mine, ...MANTRAS], skips().m);
+}
+function todayQuote() {
+  const mine = lines(s.today.myQuotes).map((l) => { const [t, a = ''] = l.split('|'); return [t.trim(), a.trim()]; }).filter(([t]) => t);
+  return pickOf(s.today.mine && mine.length ? mine : [...mine, ...QUOTES], skips().q);
+}
+function todayView(cls = '') {
+  const t = s.today, out = [];
+  if (t.mantra) { const m = todayMantra(); if (m) out.push(`<p class="mantra"><span>${esc(m)}</span><button class="skip" data-act="skip" data-val="m" aria-label="Show another mantra" data-tip="Show another">${MARK.next}</button></p>`); }
+  if (t.focus) {
+    const f = mainFocus();
+    out.push(f && f.t && !ui.mfEdit
+      ? `<div class="mf${f.d ? ' done' : ''}"><input type="checkbox" class="chk" data-mf${f.d ? ' checked' : ''} aria-label="Mark today's focus as done"><button class="mf-t" data-act="mf-edit" data-tip="Edit">${esc(f.t)}</button><button class="skip" data-act="mf-clear" aria-label="Clear today's focus" data-tip="Clear">${MARK.x}</button></div>`
+      : `<form class="mf-in" data-mfform><input name="t" value="${esc(f?.t || '')}" placeholder="What is your main focus today?" aria-label="Main focus for today" autocomplete="off" maxlength="120" enterkeyhint="done"><span class="bar" aria-hidden="true"></span></form>`);
+  }
+  return out.length ? `<div class="today ${cls}">${out.join('')}</div>` : '';
+}
+function quoteView() {
+  if (!s.today.quote) return '';
+  const q = todayQuote(); if (!q) return '';
+  return `<figure class="quote"><blockquote>${esc(q[0])}</blockquote>${q[1] ? `<figcaption>${esc(q[1])}</figcaption>` : ''}<button class="skip" data-act="skip" data-val="q" aria-label="Show another quote" data-tip="Show another">${MARK.next}</button></figure>`;
+}
+function countView() {
+  const t = s.today; if (!t.count || !t.countDate) return '';
+  const at = new Date(t.countDate + 'T00:00'), days = Math.round((at - new Date(dayKey() + 'T00:00')) / 864e5);
+  if (isNaN(days)) return '';
+  const when = days === 0 ? 'today' : days === 1 ? 'tomorrow' : days === -1 ? 'yesterday' : days > 0 ? `in ${count(days, 'day', 'days')}` : `${count(-days, 'day', 'days')} ago`;
+  return `<div class="pill cd" data-tip="${esc(at.toLocaleDateString(undefined, { dateStyle: 'long' }))}"><span>${esc(t.countName || 'Countdown')}</span><span class="mute">${when}</span></div>`;
+}
+
+/* ---------- Focus timer on the page ----------
+   State lives in focus.js (shared by every tab). This tab ticks once a second while a timer runs,
+   paints every [data-ft] / [data-fphase], and moves a finished phase on (tDue locks, so one tab does it). */
+const timerInClock = () => s.focus.show && s.focus.big && tActive(tGet());
+function phaseLabel(t) {
+  if (t.kind === 'up') return t.run ? 'Counting up' : 'Paused';
+  if (!t.run && tActive(t)) return 'Paused';
+  return t.phase === 'work' ? `Focus ${t.round} of ${s.focus.rounds}` : t.phase === 'short' ? 'Short break' : 'Long break';
+}
+const timerText = (t) => fmtTimer(t.kind === 'up' ? tUp(t) : tLeft(t, s.focus));
+function focusBtn() {
+  if (!s.focus.show) return '';
+  const t = tGet(), on = ui.focusOpen ? ' on' : '';
+  if (!tActive(t)) return `<button class="ibtn${on}" data-act="focus" aria-expanded="${!!ui.focusOpen}" aria-label="Focus timer" aria-keyshortcuts="f">${MARK.timer}</button>`;
+  return `<button class="pill fpill${on}${t.run ? '' : ' paused'}" data-act="focus" aria-expanded="${!!ui.focusOpen}" aria-label="Focus timer"><i class="fdot ${t.kind === 'up' ? 'work' : t.phase}" aria-hidden="true"></i><span data-ft>${timerText(t)}</span></button>`;
+}
+function focusPanel() {
+  if (!ui.focusOpen || !s.focus.show) return '';
+  const t = tGet(), up = t.kind === 'up', act = tActive(t), st = focusStats(), max = Math.max(30, ...st.days.map((d) => d.m));
+  const kinds = [['pomo', 'Pomodoro'], ['up', 'Count up']].map(([v, l]) => `<button role="radio" aria-checked="${t.kind === v}" class="${t.kind === v ? 'on' : ''}" data-act="t-kind" data-val="${v}">${l}</button>`).join('');
+  const bars = st.days.map((d, i) => `<span class="fbar${i === 6 ? ' now' : ''}" data-tip="${esc(d.d.toLocaleDateString(undefined, { weekday: 'long' }))}: ${fmtMin(d.m)}"><i style="height:${Math.max(d.m ? 8 : 2, Math.round((d.m / max) * 100))}%"></i><b>${d.d.toLocaleDateString(undefined, { weekday: 'narrow' })}</b></span>`).join('');
+  return `<section class="fpanel" role="dialog" aria-label="Focus timer">
+    <div class="seg full fkind" role="radiogroup" aria-label="Timer type"><i class="seg-ind" aria-hidden="true"></i>${kinds}</div>
+    <div class="fread"><span class="ftime" data-ft>${timerText(t)}</span><span class="mute" data-fphase>${phaseLabel(t)}</span></div>
+    <div class="fctl"><button class="btn primary" data-act="t-go" data-tgo>${t.run ? 'Pause' : act ? 'Resume' : 'Start'}</button><button class="btn" data-act="t-reset"${act ? '' : ' disabled'}>${up ? 'Finish' : 'Reset'}</button>${up ? '' : '<button class="btn quiet" data-act="t-skip">Skip</button>'}</div>
+    <div class="fsnd"><select class="sel" data-fsound aria-label="Sound">${SOUNDS.map(([v, l]) => `<option value="${v}"${audio.on() === v ? ' selected' : ''}>${v === 'off' ? 'No sound' : l}</option>`).join('')}</select><input class="vol" type="range" min="0" max="1" step="0.05" value="${s.focus.vol}" data-fvol aria-label="Volume"${audio.on() === 'off' ? ' disabled' : ''}></div>
+    <div class="fstats"><div class="fbars" role="img" aria-label="Focus minutes, last 7 days">${bars}</div>
+      <div class="fnums"><span><b>${fmtMin(st.today)}</b> today</span><span>${fmtMin(st.week)} this week</span>${st.streak > 1 ? `<span>${st.streak}-day streak</span>` : ''}</div></div>
+    <button class="link mute fset" data-act="focus-settings">Focus settings</button></section>`;
+}
+let ftick;
+function focusTick() {
+  clearTimeout(ftick);
+  const t = tGet();
+  if (t.kind === 'pomo' && t.run && t.end <= Date.now()) { tDue().then(() => { platform.timerAlarm(tGet()); focusPaint(); }); return; }
+  focusPaint();
+  // Wake just after the display changes: the next whole second of the timer, not of the wall clock.
+  if (t.run) ftick = setTimeout(focusTick, (t.kind === 'up' ? 1000 - (tUp(t) % 1000) : tLeft(t, s.focus) % 1000 || 1000) + 10);
+}
+function focusPaint() {
+  const t = tGet();
+  // Starting or ending a timer swaps the big clock and the top-bar button, so redraw the page.
+  if (tActive(t) !== ui.fActive) return render();
+  const txt = timerText(t);
+  $$('[data-ft]').forEach((n) => (n.textContent = txt));
+  $$('[data-fphase]').forEach((n) => (n.textContent = phaseLabel(t)));
+  const go = $('[data-tgo]'); if (go) go.textContent = t.run ? 'Pause' : tActive(t) ? 'Resume' : 'Start';
+  $('.fpill')?.classList.toggle('paused', !t.run);
+  const dot = $('.fpill .fdot'); if (dot) dot.className = `fdot ${t.kind === 'up' ? 'work' : t.phase}`;
+  document.title = t.run ? `${txt} · ${t.kind === 'pomo' && t.phase !== 'work' ? 'Break' : 'Focus'}` : 'New Tab';
+}
+function timerChanged(t) {
+  platform.timerAlarm(t);
+  if (s.focus.withTimer && s.focus.sound !== 'off') {
+    if (t.run && audio.on() === 'off') audio.play(s.focus.sound, s.focus.vol);
+    if (!tActive(t)) audio.stop();
+  }
+  render();
+}
+function toggleFocus(open = !ui.focusOpen) {
+  ui.focusOpen = open; if (open && s.notes.open) { s.notes.open = false; save(); }
+  render(); if (open) $('.fpanel [data-tgo]')?.focus();
+}
+addEventListener('storage', (e) => {
+  if (e.key === T_KEY) focusTick();
+  if (e.key === LOG_KEY && ui.focusOpen) render();
+  if (e.key === TODAY_KEY || e.key === SKIP_KEY) render();
+});
+// A tab left open past midnight shows the new day's mantra, quote and an empty focus.
+let dayNow = dayKey();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { if (dayKey() !== dayNow) { dayNow = dayKey(); render(); } else focusTick(); } });
+
 /* ---------- Settings window ---------- */
 const ui = { sec: 'Layout', bgTab: 'mine', uq: '', wq: 'landscape', results: null, drag: null };
 // Wallhaven was off until Unsplash approved the production key (2026-11-14). Flip to hide the tab again.
 const WALLHAVEN = true;
 const CLOCK_FONTS = [['serif', 'Serif'], ['sans', 'Sans'], ['pixel', 'Pixel'], ['dot', 'Dot']];
 // Clock lives inside Layout (v0.9.11): its options depend on the layout, and alone it was a thin tab.
-const SECTIONS = ['Layout', 'Background', 'Favorites', 'Search', 'Weather', 'Notes'];
+// v0.10: grouped so the list reads as places on the page, then tools, then app-wide options.
+const GROUPS = [['Appearance', ['Layout', 'Background']], ['Home page', ['Today', 'Favorites', 'Search', 'Weather']], ['Productivity', ['Focus', 'Notes']], ['', ['General']]];
+const SECTIONS = GROUPS.flatMap((g) => g[1]);
 const get = (path) => path.split('.').reduce((o, k) => o[k], s);
 function set(path, val) { const ks = path.split('.'), last = ks.pop(); ks.reduce((o, k) => o[k], s)[last] = val; }
 const seg = (path, opts, full) => `<div class="seg${full ? ' full' : ''}" role="radiogroup" data-lbl><i class="seg-ind" aria-hidden="true"></i>${opts.map(([v, l]) => `<button role="radio" aria-checked="${get(path) === v}" class="${get(path) === v ? 'on' : ''}" data-set="${path}" data-val='${JSON.stringify(v)}'>${l}</button>`).join('')}</div>`;
@@ -746,6 +875,41 @@ const SECTION = {
     + row('Focus search on new tab', 'Start typing right away. Off keeps focus in the address bar.', tog('search.focus'))
     + `<div class="sub">Bangs</div><p class="desc">Type one before or after your words to search that site, like <code>!yt lofi</code>.</p><div class="bangs">${BANGS.map((b) => `<span><code>!${b.k}</code>${esc(b.name)}</span>`).join('')}</div>`,
   Weather: () => weatherRows(),
+  Today: () => {
+    const t = s.today;
+    const area = (path, ph, label) => `<textarea class="field area" data-text="${path}" rows="3" placeholder="${ph}" aria-label="${label}" spellcheck="true">${esc(get(path))}</textarea>`;
+    return row('Main focus', 'Asks for the one thing you want to get done today, under the clock. It clears at midnight.', tog('today.focus'))
+    + row('Mantra', 'A short line under the clock to come back to. A new one each day.', tog('today.mantra'))
+    + `<div class="row stack${t.mantra ? '' : ' off'}"${t.mantra ? '' : ' inert'}><div><div>Your mantras</div><div class="desc">One per line. They join Lumen’s.</div></div>${area('today.myMantras', 'Breathe, then begin.', 'Your mantras')}</div>`
+    + row('Quote', 'A quote from a well-known writer, centered in the top bar. A new one each day.', tog('today.quote'))
+    + `<div class="row stack${t.quote ? '' : ' off'}"${t.quote ? '' : ' inert'}><div><div>Your quotes</div><div class="desc">One per line. Put the author after a bar, like: Make it work, then make it nice | Me</div></div>${area('today.myQuotes', 'Make it work, then make it nice | Me', 'Your quotes')}</div>`
+    + row('Only show mine', 'Use just your own mantras and quotes, once you have added some.', tog('today.mine'))
+    + `<div class="sub">Countdown</div>`
+    + row('Show a countdown', 'Days left until a date, in the top bar.', tog('today.count'))
+    + `<div class="row cdrow${t.count ? '' : ' off'}"${t.count ? '' : ' inert'}><input class="field" data-text="today.countName" value="${esc(t.countName)}" placeholder="What’s happening" aria-label="Countdown name" maxlength="40"><input class="field" type="date" data-text="today.countDate" value="${esc(t.countDate)}" aria-label="Countdown date"></div>`;
+  },
+  Focus: () => {
+    const f = s.focus, st = focusStats(), mins = (list) => list.map((m) => [m, m + ' min']);
+    return row('Show focus timer', 'A timer button in the top bar. Press F to open it.', tog('focus.show'))
+    + `<div class="sub">Pomodoro</div>`
+    + row('Focus', 'How long each focus round lasts.', pick('focus.work', mins([15, 20, 25, 30, 40, 45, 50, 60, 90])), !f.show)
+    + row('Short break', null, pick('focus.short', mins([3, 5, 10, 15])), !f.show)
+    + row('Long break', null, pick('focus.long', mins([10, 15, 20, 30])), !f.show)
+    + row('Rounds before a long break', null, pick('focus.rounds', [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']]), !f.show)
+    + row('Start the next round by itself', 'Off waits for you to press Start after each focus round and break.', tog('focus.auto'), !f.show)
+    + row('Chime when time is up', 'A short, soft bell.', tog('focus.chime'), !f.show)
+    + row('Show the timer in the large clock', 'While a timer runs, the large clock counts it down.', tog('focus.big'), !f.show || s.clock.show !== 'large' || s.layout === 'strip')
+    + `<div class="sub">Sounds</div>`
+    + row('Sound', 'Made in your browser; nothing is downloaded. Keeps playing after you leave the new tab.', pick('focus.sound', SOUNDS.map(([v, l]) => [v, l])), !f.show)
+    + sliderRow('Volume', 'How loud the sound and chime are.', 'focus.vol', 0, 1, 0.05, !f.show || f.sound === 'off')
+    + row('Play with the timer', 'Starts the sound when a timer starts, and stops it when you reset.', tog('focus.withTimer'), !f.show || f.sound === 'off')
+    + `<div class="sub">Your focus</div>`
+    + `<div class="fsum"><span><b>${fmtMin(st.today)}</b><span class="desc">today</span></span><span><b>${fmtMin(st.week)}</b><span class="desc">last 7 days</span></span><span><b>${count(st.streak, 'day', 'days')}</b><span class="desc">streak</span></span></div>`
+    + row('Clear focus history', 'Kept only in this browser.', '<button class="btn" data-act="clear-flog" data-lbl>Clear</button>', !st.week && !Object.keys(store.get(LOG_KEY) || {}).length);
+  },
+  General: () => row('Reduce visual effects', 'Turns off glass blur, liquid glass, photo fades and animations. Try it if new tabs open slowly on this computer.', tog('lite'))
+    + `<div class="sub">Keyboard</div><div class="keys"><span><kbd>/</kbd>Search</span><span><kbd>F</kbd>Focus timer</span><span><kbd>,</kbd>Settings</span><span><kbd>Esc</kbd>Close</span></div>`,
+
   Notes: () => row('Show notes', 'Adds a Notes button to the top bar.', tog('notes.show'))
     + row('Completed tasks', 'Start a line with [ ] for a task, > for a toggle, # for a heading.', pick('notes.done', [['keep', 'Keep in place'], ['bottom', 'Move to bottom'], ['hide', 'Hide']]), !s.notes.show)
     + row('Clear completed', 'Removes every ticked task. Notes stay.', '<button class="btn" data-act="clear-done" data-lbl>Clear</button>', !s.notes.show || !s.notes.items.some((x) => x.k && x.d)),
@@ -844,7 +1008,7 @@ function openSettings(sec, instant) {
   const first = !lazyLoaded; loadLazyScripts().then(() => { if (first && $('.win')) renderSection(); });
   // Opened from the keyboard: no animation (a shortcut should feel instant).
   $('#layer').innerHTML = `<div class="scrim${instant ? ' instant' : ''}" data-scrim="settings"><div class="win" role="dialog" aria-modal="true" aria-label="Settings">
-    <nav class="sbar"><i class="nav-ind" aria-hidden="true"></i>${SECTIONS.map((n) => `<button class="nav" data-sec="${n}">${NAV_ICON[n]}${n}</button>`).join('')}
+    <nav class="sbar"><i class="nav-ind" aria-hidden="true"></i>${GROUPS.map(([g, list]) => `${g ? `<div class="ngroup">${g}</div>` : '<div class="ngap"></div>'}${list.map((n) => `<button class="nav" data-sec="${n}">${NAV_ICON[n]}${n}</button>`).join('')}`).join('')}
       <div class="sfoot"><a href="https://x.com/feat_ashish" target="_blank" rel="noopener" aria-label="Follow @feat_ashish on X">${X_LOGO}Follow @feat_ashish</a></div></nav>
     <section class="content"></section></div></div>`;
   renderSection();
@@ -990,6 +1154,11 @@ async function allowOnline() { return true; }
 async function hasOnline() { return true; }
 function dropOnline() {}
 const suggestUrl = (q) => '/api/suggest?engine=duckduckgo&q=' + encodeURIComponent(q);
+
+// Focus sounds play in this page. The extension plays them in an offscreen page instead, so they
+// keep going after the new tab is closed or navigated away.
+const audio = { play: playSound, stop: stopSound, vol: setVolume, on: soundOn };
+const platform = { timerAlarm() {} };
 
 /* ---------- Search ----------
    Order: your past searches, your own sites, then DuckDuckGo's suggestions if you turned them on.
@@ -1197,6 +1366,16 @@ document.addEventListener('click', (e) => {
   const i = +d.i;
   switch (d.act) {
     case 'settings': return openSettings();
+    case 'focus': return toggleFocus();
+    case 'focus-settings': ui.focusOpen = false; render(); return openSettings('Focus');
+    case 't-go': { const t = tGet(); timerChanged(t.run ? tPause() : tStart()); return $('.fpanel [data-tgo]')?.focus(); }
+    case 't-reset': timerChanged(tReset()); return $('.fpanel [data-tgo]')?.focus();
+    case 't-skip': timerChanged(tSkip()); return $('.fpanel [data-tgo]')?.focus();
+    case 't-kind': { if (tGet().kind === d.val) return; timerChanged(tReset(d.val)); return $(`.fpanel [data-act=t-kind][data-val=${d.val}]`)?.focus(); }
+    case 'skip': { const k = skips(); k[d.val]++; store.set(SKIP_KEY, k); render(); return $(`[data-act=skip][data-val=${d.val}]`)?.focus(); }
+    case 'mf-edit': ui.mfEdit = true; render(); { const f = $('[data-mfform] input'); f?.focus(); f?.select(); } return;
+    case 'mf-clear': store.set(TODAY_KEY, null); ui.mfEdit = false; render(); return $('[data-mfform] input')?.focus();
+    case 'clear-flog': store.set(LOG_KEY, {}); render(); renderSection(); return toast('Focus history cleared.');
     case 'online-yes': return setOnline(true);
     case 'online-no': return setOnline(false);
     case 'bang-off': setBang(null); return $('[data-search] input').focus();
@@ -1209,7 +1388,7 @@ document.addEventListener('click', (e) => {
       photoSetChanged(); renderSection(); return toast(`Added ${add.length} from ${c.name}.`);
     }
     case 'close': return $('[data-scrim=dialog]') ? closeDialog() : closeLayer();
-    case 'notes': s.notes.open = !s.notes.open; save(); ui.notesEnter = s.notes.open; render(); ui.notesEnter = false; if (s.notes.open) { const all = $$('.notes textarea'); if (all.length) focusNote(+all.at(-1).dataset.note, true); } else $('[data-act=notes]')?.focus(); return;
+    case 'notes': s.notes.open = !s.notes.open; if (s.notes.open) ui.focusOpen = false; save(); ui.notesEnter = s.notes.open; render(); ui.notesEnter = false; if (s.notes.open) { const all = $$('.notes textarea'); if (all.length) focusNote(+all.at(-1).dataset.note, true); } else $('[data-act=notes]')?.focus(); return;
     case 'add': e.preventDefault(); return editFav(-1);
     case 'fcancel': ui.fedit = null; ui.ferr = ''; renderSection(); return $('.win [data-act=add]')?.focus();
     case 'icon-reset': ui.ficon = null; return previewIcon();
@@ -1276,6 +1455,11 @@ document.addEventListener('contextmenu', (e) => {
 document.addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;
+  if (f.matches('[data-mfform]')) {
+    const v = f.t.value.trim(); ui.mfEdit = false;
+    store.set(TODAY_KEY, v ? { day: dayKey(), t: v, d: mainFocus()?.d && mainFocus().t === v } : null);
+    render(); return (v ? $('.mf .chk') : $('[data-mfform] input'))?.focus();
+  }
   if (f.matches('[data-search]')) {
     if (sg.on >= 0) return openOption(sg.on);
     const q = f.q.value.trim();
@@ -1292,7 +1476,17 @@ document.addEventListener('submit', (e) => {
 });
 document.addEventListener('change', (e) => {
   const t = e.target;
-  if (t.dataset.sel) { set(t.dataset.sel, typeof get(t.dataset.sel) === 'number' ? +t.value : t.value); changed(); }
+  if (t.dataset.sel) {
+    set(t.dataset.sel, typeof get(t.dataset.sel) === 'number' ? +t.value : t.value);
+    if (t.dataset.sel === 'focus.sound' && audio.on() !== 'off') t.value === 'off' ? audio.stop() : audio.play(t.value, s.focus.vol);
+    changed();
+  }
+  if (t.dataset.mf != null) { const m = mainFocus(); if (m) { m.d = t.checked; store.set(TODAY_KEY, m); setTimeout(render, 180); } }
+  if (t.dataset.fsound != null) {
+    s.focus.sound = t.value; save();
+    t.value === 'off' ? audio.stop() : audio.play(t.value, s.focus.vol);
+    const v = $('[data-fvol]'); if (v) v.disabled = t.value === 'off';
+  }
   if (t.dataset.noteChk != null) { s.notes.items[+t.dataset.noteChk].d = t.checked; save(); setTimeout(render, 180); }
   if (t.dataset.file != null) handleFiles(t.files);
   if (t.dataset.ficon != null) { pickIcon(t.files[0]); t.value = ''; }
@@ -1334,9 +1528,12 @@ document.addEventListener('input', (e) => {
     t.parentNode.style.setProperty('--v', (t.value - t.min) / (t.max - t.min));
     t.setAttribute('aria-valuetext', pct(+t.value));
     const val = t.parentNode.querySelector('.sld-val'); if (val && !val.firstElementChild) val.textContent = pct(+t.value);
-    html.style.setProperty(t.dataset.range === 'bg.frost' ? '--frost' : '--dim', t.value);
+    if (t.dataset.range === 'focus.vol') audio.vol(+t.value);
+    else html.style.setProperty(t.dataset.range === 'bg.frost' ? '--frost' : '--dim', t.value);
   }
   if (t.dataset.hex != null) { const h = normHex(t.value); if (h) setColor(h, 'hex'); }
+  if (t.dataset.fvol != null) { s.focus.vol = +t.value; audio.vol(+t.value); save(false); }
+  if (t.dataset.text) { set(t.dataset.text, t.value); save(false); clearTimeout(ui.textT); ui.textT = setTimeout(render, 250); }
   if (t.dataset.picker != null) setColor(t.value.toLowerCase(), 'picker');
 });
 document.addEventListener('keydown', (e) => {
@@ -1397,6 +1594,8 @@ document.addEventListener('keydown', (e) => {
     if ($('[data-scrim=dialog]')) return closeDialog();
     if (!$('#layer').innerHTML && $('#toasts').textContent) { $('#toasts').textContent = ''; return; }
     if ($('#layer').innerHTML) return closeLayer();
+    if (ui.mfEdit && t.closest?.('[data-mfform]')) { ui.mfEdit = false; render(); return $('.mf-t')?.focus(); }
+    if (ui.focusOpen) { ui.focusOpen = false; render(); return $('[data-act=focus]')?.focus(); }
     if (s.notes.open) { s.notes.open = false; save(); render(); }
     return;
   }
@@ -1407,6 +1606,7 @@ document.addEventListener('keydown', (e) => {
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === ',') { e.preventDefault(); openSettings(null, true); }
+  if ((e.key === 'f' || e.key === 'F') && s.focus.show) { e.preventDefault(); return toggleFocus(); }
   if (e.key === '/') { const q = $('[data-search] input'); if (q) { e.preventDefault(); q.focus(); } }
 });
 

@@ -158,7 +158,7 @@ svg { width: 16px; height: 16px; flex: none; }
 /* Notes */
 .notes { position: fixed; z-index: 6; top: calc(var(--mast) - 10px); right: var(--pad); width: 320px; max-height: 60vh; overflow: auto; padding: 14px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 50px var(--shade); overscroll-behavior: contain; }
 .notes.pop-in { animation: pop .2s var(--ease); }
-:root[data-mode=photo] .notes, :root[data-mode=photo] .win, :root[data-mode=photo] .dlg, :root[data-mode=photo] .dock, :root[data-mode=photo] .st { --line: rgba(237,237,236,.1); --mute: rgba(237,237,236,.55); --faint: rgba(237,237,236,.35); }
+:root[data-mode=photo] .notes, :root[data-mode=photo] .fpanel, :root[data-mode=photo] .win, :root[data-mode=photo] .dlg, :root[data-mode=photo] .dock, :root[data-mode=photo] .st { --line: rgba(237,237,236,.1); --mute: rgba(237,237,236,.55); --faint: rgba(237,237,236,.35); }
 .notes-h { display: flex; justify-content: space-between; color: var(--mute); margin-bottom: 6px; }
 .chk { appearance: none; flex: none; width: 16px; height: 16px; margin: 0; border: 1px solid var(--faint); border-radius: 5px; display: grid; place-items: center; cursor: pointer; transition: background .15s, border-color .15s, transform 150ms ease-out; }
 .chk:active { transform: scale(.9); }
@@ -169,7 +169,7 @@ svg { width: 16px; height: 16px; flex: none; }
 /* Overlays */
 .scrim { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.45); animation: fade .16s; }
 .win { width: min(880px, 94vw); height: min(600px, 90vh); display: flex; overflow: hidden; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 24px 64px var(--shade); animation: pop .22s var(--ease); }
-:root[data-mode=photo] .win, :root[data-mode=photo] .dlg, :root[data-mode=photo] .notes, :root[data-mode=photo] .dock, :root[data-mode=photo] .st { background: #1c1c1f; }
+:root[data-mode=photo] .win, :root[data-mode=photo] .dlg, :root[data-mode=photo] .notes, :root[data-mode=photo] .fpanel, :root[data-mode=photo] .dock, :root[data-mode=photo] .st { background: #1c1c1f; }
 .sbar { flex: none; width: 200px; display: flex; flex-direction: column; gap: 2px; padding: 16px; background: var(--fill); border-right: 1px solid var(--line); box-sizing: border-box; }
 .nav { all: unset; padding: 7px 10px; border-radius: 6px; color: var(--mute); cursor: pointer; transition: background .12s, color .12s, transform 150ms ease-out; }
 .nav:hover { color: var(--ink); }
@@ -313,7 +313,7 @@ svg { width: 16px; height: 16px; flex: none; }
 /* Glass: frosted, see-through surfaces. One slider (--frost, 0 to 1) sets blur and tint together. */
 :root { --glass-edge: rgba(255,255,255,.12); }
 :root[data-tone=light] { --glass-edge: rgba(255,255,255,.7); }
-:root[data-glass=frost] .dock, :root[data-glass=frost] .st, :root[data-glass=frost] .notes {
+:root[data-glass=frost] .dock, :root[data-glass=frost] .st, :root[data-glass=frost] .notes, :root[data-glass=frost] .fpanel {
   background: color-mix(in srgb, var(--panel) calc(25% + var(--frost, .5) * 40%), transparent);
   -webkit-backdrop-filter: blur(calc(6px + var(--frost, .5) * 18px)) saturate(1.4);
   backdrop-filter: blur(calc(6px + var(--frost, .5) * 18px)) saturate(1.4);
@@ -502,13 +502,13 @@ svg { width: 16px; height: 16px; flex: none; }
 @media (max-width: 720px), (max-height: 520px) { .nav-ind { display: none; } .nav.on { background: var(--fill2) !important; } }
 @media (prefers-reduced-motion: reduce) { .nav-ind { transition: none; } }
 /* Scrollbars: a thin rounded thumb that only darkens when you reach for it */
-:is(.content, .notes, .more-pop)::-webkit-scrollbar { width: 12px; }
+:is(.content, .notes, .fpanel, .more-pop)::-webkit-scrollbar { width: 12px; }
 /* Track stops short of both ends so the thumb never runs into the 14px rounded corners. */
-:is(.content, .notes, .more-pop)::-webkit-scrollbar-track { background: transparent; margin: 14px 0; }
-:is(.content, .notes, .more-pop)::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: 6px; background: var(--fill2) padding-box; }
-:is(.content, .notes, .more-pop):hover::-webkit-scrollbar-thumb { background-color: var(--faint); }
-:is(.content, .notes, .more-pop)::-webkit-scrollbar-thumb:hover { border-width: 3px; background-color: var(--mute); }
-@supports not selector(::-webkit-scrollbar) { .content, .notes, .more-pop { scrollbar-width: thin; scrollbar-color: var(--fill2) transparent; } }
+:is(.content, .notes, .fpanel, .more-pop)::-webkit-scrollbar-track { background: transparent; margin: 14px 0; }
+:is(.content, .notes, .fpanel, .more-pop)::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: 6px; background: var(--fill2) padding-box; }
+:is(.content, .notes, .fpanel, .more-pop):hover::-webkit-scrollbar-thumb { background-color: var(--faint); }
+:is(.content, .notes, .fpanel, .more-pop)::-webkit-scrollbar-thumb:hover { border-width: 3px; background-color: var(--mute); }
+@supports not selector(::-webkit-scrollbar) { .content, .notes, .fpanel, .more-pop { scrollbar-width: thin; scrollbar-color: var(--fill2) transparent; } }
 /* New-favorite row: a globe stands in for the favicon until there is an address */
 .ico.ghosted { box-shadow: none; background: var(--fill2); color: var(--mute); }
 .ico.ghosted svg { width: 15px; height: 15px; }
@@ -559,7 +559,7 @@ svg { width: 16px; height: 16px; flex: none; }
   -webkit-backdrop-filter: blur(3px) saturate(1.6); backdrop-filter: blur(3px) saturate(1.6);
 }
 /* Text-heavy panels keep more tint so notes and menus stay readable over any photo. */
-:root[data-glass=liquid] .notes, :root[data-glass=liquid] .more-pop {
+:root[data-glass=liquid] .notes, :root[data-glass=liquid] .fpanel, :root[data-glass=liquid] .more-pop {
   background: color-mix(in srgb, var(--panel) 45%, transparent);
   border-color: transparent;
   box-shadow: inset 1px 1px 0 rgba(255,255,255,.35), inset -1px -1px 0 rgba(255,255,255,.12), 0 20px 50px var(--shade);
@@ -570,13 +570,13 @@ svg { width: 16px; height: 16px; flex: none; }
 
 /* v0.9.11 Solid surfaces: Black or White, independent of the page tone. Each surface re-declares
    the text tokens so its contents (icons, notes text, the second clock) read on its own color. */
-:root[data-glass=solid] :is(.dock, .st, .notes, .more-pop) { color: var(--ink); background: var(--panel); border-color: var(--line); }
+:root[data-glass=solid] :is(.dock, .st, .notes, .fpanel, .more-pop) { color: var(--ink); background: var(--panel); border-color: var(--line); }
 :root[data-glass=solid] :is(.pill, .ibtn) { color: var(--ink); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
-:root[data-glass=solid][data-surface=black] :is(.dock, .st, .notes, .more-pop, .pill, .ibtn) {
+:root[data-glass=solid][data-surface=black] :is(.dock, .st, .notes, .fpanel, .more-pop, .pill, .ibtn) {
   --panel: #18181a; --ink: #ededec; --mute: rgba(237,237,236,.6); --faint: rgba(237,237,236,.38);
   --line: rgba(237,237,236,.1); --fill: rgba(237,237,236,.06); --fill2: rgba(237,237,236,.12);
 }
-:root[data-glass=solid][data-surface=white] :is(.dock, .st, .notes, .more-pop, .pill, .ibtn) {
+:root[data-glass=solid][data-surface=white] :is(.dock, .st, .notes, .fpanel, .more-pop, .pill, .ibtn) {
   --panel: #ffffff; --ink: #1a1a1a; --mute: rgba(26,26,26,.62); --faint: rgba(26,26,26,.38);
   --line: rgba(26,26,26,.1); --fill: rgba(26,26,26,.05); --fill2: rgba(26,26,26,.1);
 }
@@ -712,3 +712,90 @@ svg { width: 16px; height: 16px; flex: none; }
 .link.ul { text-decoration: underline; text-underline-offset: 2px; }
 /* Notes footer: the same space above the text as the panel leaves below it */
 .notes-f { padding-top: 14px; }
+
+/* ---------- v0.10 Today, Focus, General ---------- */
+/* Quote: centered in the top bar, in the clock's serif. Two lines at most; hidden when the bar gets crowded. */
+.quote { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(40vw, 560px); margin: 0; display: grid; justify-items: center; gap: 3px; text-align: center; color: var(--mute); }
+.quote blockquote { margin: 0; color: var(--ink); font-family: "Geist Serif", Geist, serif; font-size: .9375rem; line-height: 1.35; text-wrap: balance; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.quote figcaption { font-size: .75rem; }
+.quote .skip { position: absolute; right: -32px; top: 50%; transform: translateY(-50%); }
+@media (max-width: 1180px) { .quote { display: none; } }
+
+/* Show-another and clear: quiet until you point at the line they belong to */
+.skip { all: unset; flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 13px; color: var(--mute); cursor: pointer; opacity: 0; transition: opacity 150ms ease, background 150ms ease, color 150ms ease; }
+.skip svg { width: 14px; height: 14px; }
+:is(.mantra, .mf, .quote):hover .skip, .skip:focus-visible { opacity: 1; }
+.skip:hover { background: var(--fill2); color: var(--ink); }
+@media (hover: none) { .skip { opacity: .7; } }
+
+/* Today: mantra and main focus under the clock */
+.today { display: grid; gap: 14px; margin-top: 30px; justify-items: start; }
+.ed .today { padding-left: 8px; }
+.dk .today { justify-items: center; margin-top: 30px; }
+.mantra { margin: 0; display: flex; align-items: center; gap: 6px; font-family: "Geist Serif", Geist, serif; font-size: var(--md); line-height: 1.3; color: var(--mute); text-wrap: balance; }
+.mf { display: flex; align-items: center; gap: 12px; min-height: 40px; font-size: var(--md); }
+.mf .chk { width: 20px; height: 20px; border-radius: 6px; }
+.mf .chk:checked::after { width: 14px; height: 14px; }
+.mf-t { all: unset; cursor: text; max-width: min(560px, 70vw); overflow-wrap: anywhere; transition: color 200ms ease; }
+.mf.done .mf-t { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--faint); }
+.mf-in { position: relative; width: min(440px, 80vw); }
+.mf-in input { display: block; width: 100%; box-sizing: border-box; height: 42px; padding: 0; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); caret-color: var(--ink); font: inherit; font-size: var(--md); outline: 0; }
+.mf-in input::placeholder { color: var(--mute); }
+.mf-in .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 150ms ease-out; }
+.mf-in:focus-within .bar { transform: scaleX(1); transition-duration: 300ms; transition-timing-function: var(--ease); }
+.dk .mf-in input { text-align: center; }
+.dk .mf-in .bar { transform-origin: center; }
+/* Strip has no big clock, so the day's lines sit in the middle of the page */
+.st-today { position: fixed; left: 50%; top: 46%; transform: translate(-50%, -50%); margin: 0; justify-items: center; text-align: center; width: min(640px, 90vw); }
+.st-today .mf-in input { text-align: center; }
+
+/* Focus timer: top-bar button, its running pill, and the panel */
+button.pill { border: 0; font: inherit; color: inherit; cursor: pointer; transition: background .15s, transform 150ms ease-out; }
+button.pill:active { transform: scale(.96); }
+.fpill { gap: 8px; padding: 0 14px 0 12px; }
+.fdot { width: 7px; height: 7px; border-radius: 50%; background: #ff8a5c; }
+.fdot.short, .fdot.long { background: #5fd39b; }
+.fpill.paused .fdot { opacity: .35; }
+.fpill.paused [data-ft] { color: var(--mute); }
+.fpanel { position: fixed; z-index: 6; top: calc(var(--mast) - 10px); right: var(--pad); width: 300px; box-sizing: border-box; padding: 14px 16px 12px; display: grid; gap: 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 50px var(--shade); animation: pop .2s var(--ease); }
+.fread { display: grid; justify-items: center; gap: 6px; padding-top: 6px; }
+.ftime { font-family: "Geist Serif", Geist, serif; font-size: 3.5rem; line-height: .9; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.fctl { display: flex; justify-content: center; gap: 8px; }
+.fctl .btn.primary { min-width: 92px; justify-content: center; }
+.fsnd { display: flex; align-items: center; gap: 10px; }
+.fsnd .sel { flex: 1; min-width: 0; }
+.vol { width: 88px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+.vol:disabled { opacity: .35; cursor: default; }
+.fstats { display: grid; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fbars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; height: 62px; }
+.fbar { display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 4px; }
+.fbar > i { align-self: end; width: 100%; max-width: 20px; border-radius: 3px; background: var(--fill2); }
+.fbar.now > i { background: var(--ink); }
+.fbar b { font-weight: 400; font-size: .6875rem; line-height: 1; color: var(--faint); }
+.fnums { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--mute); }
+.fnums b { font-weight: 500; color: var(--ink); }
+.fset { justify-self: start; }
+.ftimer .ampm { white-space: nowrap; }
+
+/* Settings: grouped sidebar and the new rows */
+.ngroup { margin: 14px 10px 4px; font-size: .6875rem; color: var(--faint); }
+.nav-ind + .ngroup { margin-top: 2px; }
+.ngap { height: 12px; }
+.field.area { display: block; width: 100%; height: auto; min-height: 76px; padding: 8px 10px; line-height: 1.45; resize: vertical; }
+.cdrow { justify-content: flex-start; gap: 10px; }
+.cdrow .field { flex: 1; min-width: 0; }
+.cdrow input[type=date] { flex: 0 0 170px; color-scheme: dark; }
+:root[data-tone=light] .cdrow input[type=date] { color-scheme: light; }
+.fsum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 6px; }
+.fsum > span { display: grid; gap: 2px; padding: 12px 14px; border-radius: 10px; background: var(--fill); }
+.fsum b { font-weight: 400; font-size: var(--h); }
+.keys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; color: var(--mute); }
+.keys span { display: flex; align-items: center; gap: 10px; }
+kbd { min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; display: inline-grid; place-items: center; border-radius: 6px; background: var(--fill2); color: var(--ink); font: inherit; font-size: .75rem; }
+@media (max-width: 720px), (max-height: 520px) { .ngroup, .ngap { display: none; } .fsum { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .fpanel { left: 12px; right: 12px; width: auto; } }
+
+/* Reduce visual effects: no blur, no glass, no motion. Surfaces become plain panels. */
+:root[data-lite] *, :root[data-lite] *::before, :root[data-lite] *::after { transition: none !important; animation: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+:root[data-lite] :is(.dock, .st, .notes, .fpanel, .more-pop) { background: var(--panel) !important; }
+:root[data-lite] :is(.pill, .ibtn) { background: color-mix(in srgb, var(--panel) 88%, transparent) !important; }
