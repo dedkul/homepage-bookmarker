@@ -615,37 +615,35 @@ async function findPlace(q) {
 }
 
 /* ---------- Collections ----------
-   Curated searches shown as cards, so picking a mood doesn't start from an empty search box.
-   Each card's cover is the first result of its own search, loaded when the pane opens. */
-const COLLECTIONS = [
-  ['cozy', 'Cozy anime scenery', 'wallhaven', 'anime scenery'],
-  ['lofi', 'Lo-fi rooms', 'wallhaven', 'lofi room'],
-  ['pixel', 'Pixel worlds', 'wallhaven', 'pixel art landscape'],
-  ['rain', 'Rain on glass', 'unsplash', 'rain window'],
-  ['tokyo', 'Tokyo after dark', 'unsplash', 'tokyo night street'],
-  ['dawn', 'Mountains at dawn', 'unsplash', 'mountain sunrise'],
-  ['space', 'Deep space', 'wallhaven', 'nebula'],
-  ['quiet', 'Quiet and minimal', 'unsplash', 'minimal landscape'],
-].map(([id, name, src, q]) => ({ id, name, src, q }));
-const collRes = {};
-const searchColl = (c) => (collRes[c.id] ||= (c.src === 'wallhaven' ? searchWallhaven(c.q) : searchUnsplash(c.q)).catch((e) => { delete collRes[c.id]; throw e; }));
-function collectionsPane() {
-  if (ui.coll) {
-    const c = COLLECTIONS.find((x) => x.id === ui.coll);
-    return `<div class="ctop"><button class="link mute with-mark" data-coll="">${MARK.left}All collections</button><button class="btn" data-act="coll-all">Add all</button></div>
-      <div class="sub">${esc(c.name)} <span class="mute">· ${c.src === 'wallhaven' ? 'Wallhaven' : 'Unsplash'}</span></div>
-      <div class="rgrid" id="cresults" aria-live="polite"><span class="desc">Loading…</span></div>`;
-  }
-  return `<div class="cgrid">${COLLECTIONS.map((c) => `<button class="ccard" data-coll="${c.id}"><span class="ccover" data-cover="${c.id}"></span><span class="cname">${esc(c.name)}</span><span class="desc">${c.src === 'wallhaven' ? 'Wallhaven' : 'Unsplash'}</span></button>`).join('')}</div>`;
+   Hand-picked sets from the repo's collections/ folder, served by /api/collections (proxy/api/collections.js;
+   serve.py runs the same code on the local folder). Fetched at most every 12 hours and kept, so the tab
+   works offline and new sets reach everyone without a Store update. */
+const COLL_KEY = 'lumen.coll', COLL_TTL = 12 * 3600e3;
+let COLLECTIONS = [], collP = null, collReady = false;
+function loadCollections() {
+  if (collP) return collP;
+  let cached = null; try { cached = JSON.parse(localStorage.getItem(COLL_KEY) || 'null'); } catch (e) {}
+  if (cached && Date.now() - cached.at < COLL_TTL) { collReady = true; return (collP = Promise.resolve((COLLECTIONS = cached.list))); }
+  return (collP = fetch('/api/collections').then((r) => { if (!r.ok) throw new Error('collections ' + r.status); return r.json(); })
+    .then((d) => { COLLECTIONS = d.collections; collReady = true; try { localStorage.setItem(COLL_KEY, JSON.stringify({ at: Date.now(), list: COLLECTIONS })); } catch (e) {} return COLLECTIONS; })
+    .catch((e) => { collP = null; if (cached) { collReady = true; return (COLLECTIONS = cached.list); } throw e; }));
 }
-async function fillCollections() {
-  if (ui.coll) {
-    const c = COLLECTIONS.find((x) => x.id === ui.coll), box = $('#cresults'); if (!box) return;
-    try { const list = await searchColl(c); if ($('#cresults') && ui.coll === c.id) $('#cresults').innerHTML = results(list, c.q); }
-    catch (e) { if ($('#cresults')) $('#cresults').innerHTML = `<div class="err"><span class="desc">${e.noServer ? 'Wallhaven collections need the prototype server (python3 serve.py).' : 'Unable to load this collection. Check your connection and try again.'}</span></div>`; }
-    return;
+const collSrc = (c) => [...new Set(c.photos.map((p) => (p.source === 'wallhaven' ? 'Wallhaven' : 'Unsplash')))].join(' and ');
+const collCount = (c) => `${c.photos.length} ${c.photos.length === 1 ? 'wallpaper' : 'wallpapers'}`;
+function collectionsPane() {
+  const c = ui.coll && COLLECTIONS.find((x) => x.id === ui.coll);
+  if (c) {
+    return `<div class="ctop"><button class="link mute with-mark" data-coll="">${MARK.left}All collections</button><button class="btn" data-act="coll-all">Add all</button></div>
+      <div class="sub">${esc(c.name)} <span class="mute">· ${collCount(c)} from ${collSrc(c)}</span></div>
+      <div class="rgrid" id="cresults">${grid(c.photos)}</div>`;
   }
-  for (const c of COLLECTIONS) searchColl(c).then((list) => { const el = $(`[data-cover="${c.id}"]`); if (el && list[0]) el.style.backgroundImage = `url('${list[0].thumb}')`; }).catch(() => {});
+  if (!COLLECTIONS.length) return `<div class="cgrid" id="cgrid" aria-live="polite"><span class="desc">${collReady ? 'No collections yet.' : 'Loading…'}</span></div>`;
+  return `<div class="cgrid" id="cgrid">${COLLECTIONS.map((c) => `<button class="ccard" data-coll="${esc(c.id)}"><span class="ccover" style="background-image:url('${esc(c.photos[0].thumb)}')"></span><span class="cname">${esc(c.name)}</span><span class="desc">${collCount(c)}</span></button>`).join('')}</div>`;
+}
+function fillCollections() {
+  if (collReady) return;
+  loadCollections().then(() => { if ($('#cgrid')) renderSection(); })
+    .catch(() => { if ($('#cgrid')) $('#cgrid').innerHTML = '<div class="err"><span class="desc">Unable to load collections. Check your connection and try again.</span></div>'; });
 }
 
 /* ---------- Settings window ---------- */
@@ -1205,13 +1203,10 @@ document.addEventListener('click', (e) => {
     case 'clear-recent': writeRecent([]); return renderSection();
     case 'coll-all': {
       const c = COLLECTIONS.find((x) => x.id === ui.coll); if (!c) return;
-      searchColl(c).then((list) => {
-        const b = s.bg, room = MAX_PHOTOS - b.photos.length, add = list.filter((p) => !b.photos.some((x) => x.id === p.id)).slice(0, room);
-        if (!add.length) return toast(room ? 'These are all in your set already.' : `Your set has ${MAX_PHOTOS} photos. Remove some to add more.`);
-        b.photos.push(...add); if (b.photos.length === add.length) { b.cur = 0; b.at = Date.now(); }
-        photoSetChanged(); renderSection(); toast(`Added ${add.length} from ${c.name}.`);
-      }).catch(() => toast('Unable to load this collection.'));
-      return;
+      const b = s.bg, room = MAX_PHOTOS - b.photos.length, add = c.photos.filter((p) => !b.photos.some((x) => x.id === p.id)).slice(0, room);
+      if (!add.length) return toast(room ? 'These are all in your set already.' : `Your set has ${MAX_PHOTOS} photos. Remove some to add more.`);
+      b.photos.push(...add); if (b.photos.length === add.length) { b.cur = 0; b.at = Date.now(); }
+      photoSetChanged(); renderSection(); return toast(`Added ${add.length} from ${c.name}.`);
     }
     case 'close': return $('[data-scrim=dialog]') ? closeDialog() : closeLayer();
     case 'notes': s.notes.open = !s.notes.open; save(); ui.notesEnter = s.notes.open; render(); ui.notesEnter = false; if (s.notes.open) { const all = $$('.notes textarea'); if (all.length) focusNote(+all.at(-1).dataset.note, true); } else $('[data-act=notes]')?.focus(); return;

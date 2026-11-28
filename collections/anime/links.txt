@@ -1,0 +1,13 @@
+# Paste one wallpaper link per line: a Wallhaven page (wallhaven.cc/w/...) or an Unsplash photo page (unsplash.com/photos/...).
+# Lines starting with # are ignored.
+
+#Ghibli
+https://wallhaven.cc/w/r7vgwm
+
+#Your Name
+https://wallhaven.cc/w/eo1918
+https://wallhaven.cc/w/gj18rq
+https://wallhaven.cc/w/zxr38v
+
+#Jujutsu Kaisen
+https://whvn.cc/8ooqvk

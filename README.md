@@ -2,7 +2,7 @@
 
 A calm, fast new tab for Chrome. Your favorite sites, a clock, notes, and a wallpaper you choose. Nothing else.
 
-**Status:** the extension is built and works as an unpacked extension. It isn't in the Chrome Web Store yet: Unsplash approved it for production on 14 November 2026; store review is still pending.
+**[Install Lumen from the Chrome Web Store](https://chromewebstore.google.com/detail/lumen/ecdbhfddeonipoefmdmgnimnildbpbif)**
 
 ## Why it exists
 Nobody stares at a new tab. You glance at it for a second before you type. Lumen is designed for that glance, and that one idea set three rules:
@@ -24,7 +24,7 @@ Nobody stares at a new tab. You glance at it for a second before you type. Lumen
 ## Privacy
 No accounts, no analytics, no ads. Notes, settings, past searches and uploaded photos are stored in your browser. Site names go to an icon service, and search, weather, suggestions and wallpapers use outside services: [PRIVACY.md](PRIVACY.md) lists each one. Unsplash and Wallhaven search go through a small server proxy (`proxy/`), so the extension ships no API key.
 
-## Install (unpacked)
+## Run it from source
 1. Clone this repo.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and pick the `extension/` folder.
